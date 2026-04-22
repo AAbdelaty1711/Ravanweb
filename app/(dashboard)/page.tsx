@@ -164,21 +164,22 @@ function EmptyState({ onPromptClick }: { onPromptClick: (prompt: string) => void
       exit={{ opacity: 0 }}
       className="flex flex-col items-center justify-center h-full px-4 pb-8"
     >
-      {/* Raven logo pulsing */}
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-44 h-44 rounded-full bg-primary/8 dark:bg-white/8
-                   flex items-center justify-center mb-4"
-      >
+      {/* Raven logo with Pulse */}
+      <div className="relative mb-8 flex items-center justify-center">
         <motion.div
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10 flex items-center justify-center"
         >
-          <RavenMark size={120} className="text-primary dark:text-white" />
+          <motion.div
+            animate={{ scale: [1, 1.08, 1], opacity: [0.8, 1, 0.8] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <RavenMark size={180} className="text-primary dark:text-white" />
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
 
       {/* Greeting */}
       <motion.div

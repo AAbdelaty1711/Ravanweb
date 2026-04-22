@@ -45,8 +45,8 @@ function RavenLogo({ className }: { className?: string }) {
     <Image
       src="/ravanlogo.png"
       alt="Raven AI logo"
-      width={22}
-      height={22}
+      width={24}
+      height={24}
       className={cn("object-contain shrink-0", className)}
     />
   );
@@ -82,16 +82,15 @@ function UserPopover({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 6, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 6, scale: 0.97 }}
+      initial={{ opacity: 0, y: 6, scale: 0.97, x: "-50%" }}
+      animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
+      exit={{ opacity: 0, y: 6, scale: 0.97, x: "-50%" }}
       transition={{ duration: 0.15 }}
       className={cn(
         "absolute bottom-full mb-2 z-50",
         "bg-white dark:bg-[#1A1A24] rounded-2xl shadow-xl",
         "border border-gray-200 dark:border-white/10",
-        "overflow-hidden w-56",
-        collapsed ? "left-0" : "left-0 right-0"
+        "overflow-hidden w-56 left-1/2"
       )}
     >
       {/* User header */}
@@ -161,7 +160,7 @@ function SidebarContent({
     <div className="flex flex-col h-full">
       {/* ── Brand header ───────────────────────────────────────────── */}
       <div className="flex items-center gap-2.5 px-3.5 h-14 border-b border-border-light dark:border-[#1C1C28] shrink-0">
-        <div className="shrink-0 w-7 h-7 rounded-lg bg-primary dark:bg-white/10 flex items-center justify-center">
+        <div className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center">
           <RavenLogo />
         </div>
         <AnimatePresence>
