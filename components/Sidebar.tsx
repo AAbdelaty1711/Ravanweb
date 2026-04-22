@@ -242,26 +242,38 @@ function SidebarContent({
           return (
             <Link key={href} href={href} onClick={onClose}>
               <div className={cn(
-                "flex items-center gap-2.5 rounded-xl transition-colors cursor-pointer",
+                "relative flex items-center gap-2.5 rounded-xl cursor-pointer transition-colors",
                 collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
                 active
-                  ? "bg-primary/[0.08] dark:bg-white/[0.08] text-primary dark:text-white"
+                  ? "text-primary dark:text-white"
                   : "text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/[0.04] dark:hover:bg-white/[0.04] hover:text-text-primary-light dark:hover:text-text-primary-dark"
               )}>
-                <Icon size={16} className="shrink-0" />
+                {/* Sliding background pill */}
+                {active && (
+                  <motion.div
+                    layoutId="sidebar-active-pill"
+                    className="absolute inset-0 rounded-xl bg-primary/[0.08] dark:bg-white/[0.08]"
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  />
+                )}
+                <Icon size={16} className="shrink-0 relative z-10" />
                 <AnimatePresence>
                   {!collapsed && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center flex-1 gap-2"
+                      className="flex items-center flex-1 gap-2 relative z-10"
                     >
                       <span className="font-inter font-medium text-[13px] whitespace-nowrap flex-1">
                         {label}
                       </span>
                       {active && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary dark:bg-white" />
+                        <motion.div
+                          layoutId="sidebar-active-dot"
+                          className="w-1.5 h-1.5 rounded-full bg-primary dark:bg-white"
+                          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                        />
                       )}
                     </motion.div>
                   )}

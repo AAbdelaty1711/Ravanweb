@@ -152,6 +152,15 @@ function RadarCard({
               {returnStr}
             </span>
           </div>
+
+          <button
+            onClick={() => router.push(`/?q=Analyze+${anomaly.ticker}`)}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold
+                       bg-primary/8 dark:bg-white/10 border border-primary/15 dark:border-white/25
+                       text-primary dark:text-white transition-colors hover:bg-primary/14 dark:hover:bg-white/14"
+          >
+            <Sparkles size={11} /> Ask AI
+          </button>
         </div>
 
         {/* Tags */}
@@ -160,17 +169,6 @@ function RadarCard({
             <TagPill key={tag} label={tag} />
           ))}
         </div>
-
-        {/* Ask Raven AI button — always visible, no expand */}
-        <button
-          onClick={() => router.push(`/?q=Analyze+${anomaly.ticker}`)}
-          className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[12px] font-semibold
-                     bg-primary/7 dark:bg-white/7 border border-primary/18 dark:border-white/14
-                     text-primary dark:text-white
-                     hover:bg-primary/12 dark:hover:bg-white/12 transition-colors"
-        >
-          <Sparkles size={12} /> Ask Raven AI
-        </button>
       </div>
     </motion.div>
   );

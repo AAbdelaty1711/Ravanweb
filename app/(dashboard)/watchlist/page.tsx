@@ -11,18 +11,50 @@ import {
   TrendingUp,
   TrendingDown,
   AlertTriangle,
-  CheckCircle2,
   BarChart2,
   MessageSquare,
   Menu,
+  ArrowLeft,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 import { cn, formatPrice, formatPct, stockFaviconUrl } from "@/lib/utils";
 import { useSidebar } from "@/components/SidebarContext";
-import { INITIAL_WATCHLIST, ALL_STOCKS } from "@/lib/mock-data";
+import { INITIAL_WATCHLIST, ALL_STOCKS, TICKER_GRADIENTS } from "@/lib/mock-data";
 import type { WatchlistItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
 
-// ─── Table row ────────────────────────────────────────────────────────────────
+// ─── Company Logo (mobile fallback) ──────────────────────────────────────────
+function MobileCompanyLogo({ ticker, logoUrl }: { ticker: string; logoUrl: string }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const grad = TICKER_GRADIENTS[ticker] ?? ["#7C7C7C", "#3C3C3C"];
+  return (
+    <div
+      className="shrink-0 w-10 h-10 rounded-[12px] overflow-hidden border border-white/10 dark:border-white/12"
+      style={{ background: `linear-gradient(135deg, ${grad[0]}, ${grad[1]})` }}
+    >
+      {!imgFailed ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoUrl}
+          alt={ticker}
+          width={40}
+          height={40}
+          className="w-full h-full object-cover"
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <span className="font-outfit font-bold text-white text-[15px]">
+            {ticker[0]}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Desktop: Table row ───────────────────────────────────────────────────────
 function StockRow({
   item,
   index,
@@ -124,16 +156,7 @@ function StockRow({
         </div>
       </td>
 
-      <td className="py-3.5 pr-4 text-right hidden sm:table-cell">
-        <span className={cn(
-          "text-[10px] font-inter font-bold uppercase tracking-wide px-2 py-0.5 rounded-md border",
-          item.isUp
-            ? "bg-bull/8 text-bull border-bull/20"
-            : "bg-bear/8 text-bear border-bear/20"
-        )}>
-          {item.isUp ? "Bullish" : "Bearish"}
-        </span>
-      </td>
+
 
       <td className="py-3.5 pr-4 w-14">
         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
@@ -148,7 +171,7 @@ function StockRow({
   );
 }
 
-// ─── Add Stock Modal ──────────────────────────────────────────────────────────
+// ─── Add Stock Modal (shared) ─────────────────────────────────────────────────
 function AddStockModal({
   watchlist,
   onClose,
@@ -175,19 +198,24 @@ function AddStockModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/50 backdrop-blur-[4px]" />
       <motion.div
-        initial={{ scale: 0.96, y: 8 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.96, y: 8 }}
-        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{ type: "spring", stiffness: 340, damping: 32 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative z-10 w-full max-w-lg bg-white dark:bg-[#111118]
-                   rounded-2xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden market-pattern"
+        className="relative z-10 w-full sm:max-w-lg bg-white dark:bg-[#111118]
+                   rounded-t-[24px] sm:rounded-2xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden market-pattern"
       >
+        {/* Drag handle (mobile only) */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden shrink-0">
+          <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-700" />
+        </div>
+
         <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-white/[0.06]">
           <div className="flex-1">
             <h2 className="font-outfit font-bold text-[17px] text-primary dark:text-white">Add Stocks</h2>
@@ -226,7 +254,8 @@ function AddStockModal({
           </div>
         </div>
 
-        <div className="overflow-y-auto max-h-[380px]">
+        {/* Desktop: table */}
+        <div className="hidden sm:block overflow-y-auto max-h-[380px]">
           <table className="w-full">
             <thead className="sticky top-0 bg-gray-50 dark:bg-[#0d0d14]">
               <tr className="border-b border-gray-100 dark:border-white/[0.06]">
@@ -275,47 +304,98 @@ function AddStockModal({
             </tbody>
           </table>
         </div>
+
+        {/* Mobile: card list (Flutter-style) */}
+        <div className="sm:hidden overflow-y-auto max-h-[55vh] px-4 py-2 space-y-3">
+          {filtered.length === 0 ? (
+            <p className="text-center font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark py-10">
+              No results for "{query}"
+            </p>
+          ) : filtered.map((stock) => {
+            const isAdded = watchedTickers.has(stock.ticker);
+            return (
+              <div
+                key={stock.ticker}
+                className={cn(
+                  "flex items-center gap-3 p-3.5 rounded-[16px] border transition-all",
+                  isAdded
+                    ? "border-bull/40 bg-bull/[0.03] dark:bg-bull/[0.05]"
+                    : "border-gray-200 dark:border-[#38383A] bg-white dark:bg-[#000000]"
+                )}
+              >
+                <MobileCompanyLogo ticker={stock.ticker} logoUrl={stock.logoUrl} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-outfit font-semibold text-[13px] text-text-primary-light dark:text-text-primary-dark">
+                    {stock.ticker}
+                  </p>
+                  <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark truncate">
+                    {stock.name}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end mr-2">
+                  <span className="font-inter font-semibold text-[13px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
+                    {formatPrice(stock.currentPrice)}
+                  </span>
+                  <div className="flex items-center gap-0.5 mt-1">
+                    {stock.isUp
+                      ? <ArrowUpRight size={12} className="text-bull" />
+                      : <ArrowDownRight size={12} className="text-bear" />}
+                    <span className={cn("font-inter text-[10px] font-semibold", stock.isUp ? "text-bull" : "text-bear")}>
+                      {stock.isUp ? "Bullish" : "Bearish"}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => isAdded ? onRemove(stock.ticker) : onAdd(stock)}
+                  className={cn(
+                    "w-9 h-9 rounded-full flex items-center justify-center border transition-all shrink-0",
+                    isAdded
+                      ? "bg-bull/12 border-bull/40 text-bull"
+                      : "bg-primary/8 dark:bg-white/[0.06] border-gray-200 dark:border-white/12 text-primary dark:text-white"
+                  )}
+                >
+                  {isAdded
+                    ? <span className="text-[16px] font-bold leading-none">✓</span>
+                    : <Plus size={16} />}
+                </button>
+              </div>
+            );
+          })}
+          <div className="h-4" />
+        </div>
       </motion.div>
     </motion.div>
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-export default function WatchlistPage() {
-  const { setMobileOpen } = useSidebar();
-  const router = useRouter();
-  const [items, setItems] = useState<WatchlistItem[]>(INITIAL_WATCHLIST);
-  const [deletionMode, setDeletionMode] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
-
-  const handleRemove = (ticker: string) => setItems((p) => p.filter((i) => i.ticker !== ticker));
-  const handleAdd = (item: WatchlistItem) => setItems((p) => p.find((i) => i.ticker === item.ticker) ? p : [...p, item]);
-
-  // Click row → open chat with that ticker
-  const handleRowTap = (ticker: string) => {
-    router.push(`/?q=Analyze+${ticker}`);
-  };
-
+// ─── DESKTOP LAYOUT ───────────────────────────────────────────────────────────
+function DesktopWatchlist({
+  items,
+  deletionMode,
+  setDeletionMode,
+  setShowAddModal,
+  handleRemove,
+  handleRowTap,
+}: {
+  items: WatchlistItem[];
+  deletionMode: boolean;
+  setDeletionMode: (v: boolean) => void;
+  setShowAddModal: (v: boolean) => void;
+  handleRemove: (ticker: string) => void;
+  handleRowTap: (ticker: string) => void;
+}) {
   return (
-    <div className="flex flex-col h-full market-pattern">
+    <div className="hidden lg:flex flex-col h-full market-pattern">
       {/* Header */}
       <div className="px-5 pt-5 pb-4 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/[0.06] text-primary dark:text-white"
-            >
-              <Menu size={18} />
-            </button>
-            <div>
-              <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
-                Watchlist
-              </h1>
-              <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
-                {items.length} stock{items.length !== 1 ? "s" : ""} tracked · tap a row to ask AI
-              </p>
-            </div>
+          <div>
+            <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
+              Watchlist
+            </h1>
+            <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
+              {items.length} stock{items.length !== 1 ? "s" : ""} tracked · tap a row to ask AI
+            </p>
           </div>
           <div className="flex items-center gap-2">
             {deletionMode ? (
@@ -389,7 +469,7 @@ export default function WatchlistPage() {
                   <th className="py-2.5 pr-5 text-right font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">To T1</th>
                   <th className="py-2.5 pr-5 text-right hidden md:table-cell font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">Target 1</th>
                   <th className="py-2.5 pr-5 text-right hidden lg:table-cell font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">Target 2</th>
-                  <th className="py-2.5 pr-4 text-right hidden sm:table-cell font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">Signal</th>
+
                   <th className="py-2.5 pr-4 w-14" />
                 </tr>
               </thead>
@@ -411,7 +491,292 @@ export default function WatchlistPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
 
+// ─── MOBILE LAYOUT — Flutter clone ───────────────────────────────────────────
+
+// Mobile: Flutter-style column headers
+function MobileColumnHeaders({ deletionMode }: { deletionMode: boolean }) {
+  return (
+    <div className="mx-4 mb-2">
+      <div className="flex items-center px-3.5 py-2.5 rounded-[12px] border
+                      border-gray-200 dark:border-white/10
+                      bg-white/85 dark:bg-white/[0.04]">
+        {deletionMode && <div className="w-9 shrink-0" />}
+        {/* SYM — flex 4 */}
+        <div className="flex-[4] text-left">
+          <span className="font-inter font-semibold text-[10px] text-text-secondary-light dark:text-text-secondary-dark tracking-[0.35px]">
+            SYM
+          </span>
+        </div>
+        {/* PRICE — flex 3 */}
+        <div className="flex-[3] text-center">
+          <span className="font-inter font-semibold text-[10px] text-text-secondary-light dark:text-text-secondary-dark tracking-[0.35px]">
+            PRICE
+          </span>
+        </div>
+        {/* TARGETS — flex 3 */}
+        <div className="flex-[3] text-right">
+          <span className="font-inter font-semibold text-[10px] text-text-secondary-light dark:text-text-secondary-dark tracking-[0.35px]">
+            TARGETS
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Mobile: Flutter-style WatchCard
+function MobileWatchCard({
+  item,
+  deletionMode,
+  onDelete,
+  onTap,
+}: {
+  item: WatchlistItem;
+  deletionMode: boolean;
+  onDelete: () => void;
+  onTap: () => void;
+}) {
+  const [pressed, setPressed] = useState(false);
+  const pct = ((item.target1 - item.currentPrice) / item.currentPrice) * 100;
+  const pctStr = `${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`;
+  const trendColor = item.isUp ? "#34C759" : "#FF453A";
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.2 }}
+      onTapStart={() => !deletionMode && setPressed(true)}
+      onTap={() => { setPressed(false); !deletionMode && onTap(); }}
+      onTapCancel={() => setPressed(false)}
+      className={cn(
+        "mx-4 mb-3 overflow-hidden rounded-[16px] border transition-all",
+        deletionMode
+          ? "border-red-500/40 bg-white dark:bg-[#000000]"
+          : "border-gray-200 dark:border-[#38383A] bg-white dark:bg-[#000000]",
+        pressed && "scale-[0.985]"
+      )}
+    >
+      <div className="flex items-center px-4 py-[15px] gap-0">
+        {/* Delete button */}
+        {deletionMode && (
+          <motion.button
+            initial={{ scale: 0, width: 0 }}
+            animate={{ scale: 1, width: 36 }}
+            exit={{ scale: 0, width: 0 }}
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="shrink-0 mr-2.5 w-7 h-7 rounded-full flex items-center justify-center
+                       bg-red-500/10 border border-red-500/40 text-red-500"
+          >
+            <X size={14} />
+          </motion.button>
+        )}
+
+        {/* COLUMN 1 — SYM (flex 4) */}
+        <div className="flex-[4] flex items-center gap-2.5 min-w-0">
+          <MobileCompanyLogo ticker={item.ticker} logoUrl={item.logoUrl} />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <span className="font-outfit font-semibold text-[13px] text-text-primary-light dark:text-text-primary-dark tracking-[-0.2px]">
+                {item.ticker}
+              </span>
+              {item.hasWarning && (
+                <AlertTriangle size={14} className="text-warning shrink-0" />
+              )}
+            </div>
+            <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark truncate leading-tight mt-0.5">
+              {item.name}
+            </p>
+          </div>
+        </div>
+
+        {/* COLUMN 2 — PRICE & DIFF (flex 3) */}
+        <div className="flex-[3] flex flex-col items-center">
+          <span className="font-inter font-semibold text-[13px] text-text-primary-light dark:text-text-primary-dark tabular-nums tracking-[-0.35px]">
+            {formatPrice(item.currentPrice)}
+          </span>
+          <div
+            className="mt-1.5 px-2 py-[5px] rounded-[8px] border"
+            style={{
+              backgroundColor: `${trendColor}1F`,
+              borderColor: `${trendColor}2E`,
+            }}
+          >
+            <span
+              className="font-inter font-semibold text-[10px] leading-none"
+              style={{ color: trendColor }}
+            >
+              {pctStr}
+            </span>
+          </div>
+        </div>
+
+        {/* COLUMN 3 — TARGETS (flex 3) */}
+        <div className="flex-[3] flex flex-col items-end">
+          <div className="flex items-baseline gap-1">
+            <span className="font-inter text-[9.5px] font-semibold text-gray-500 tracking-[0.2px]">T1</span>
+            <span className="font-inter text-[11px] font-medium text-text-primary-light dark:text-gray-400 tabular-nums">
+              {formatPrice(item.target1)}
+            </span>
+          </div>
+          <div className="flex items-baseline gap-1 mt-[5px]">
+            <span className="font-inter text-[9.5px] font-semibold text-gray-500 tracking-[0.2px]">T2</span>
+            <span className="font-inter text-[11px] font-medium text-text-primary-light dark:text-gray-400 tabular-nums">
+              {formatPrice(item.target2)}
+            </span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function MobileWatchlist({
+  items,
+  deletionMode,
+  setDeletionMode,
+  setShowAddModal,
+  handleRemove,
+  handleRowTap,
+}: {
+  items: WatchlistItem[];
+  deletionMode: boolean;
+  setDeletionMode: (v: boolean) => void;
+  setShowAddModal: (v: boolean) => void;
+  handleRemove: (ticker: string) => void;
+  handleRowTap: (ticker: string) => void;
+}) {
+  const { setMobileOpen } = useSidebar();
+
+  return (
+    <div className="lg:hidden flex flex-col h-full market-pattern">
+      {/* Header — Flutter-exact */}
+      <div className="shrink-0 px-4 pt-[14px] pb-2 bg-transparent">
+        <div className="flex items-center gap-3.5">
+          {/* Menu / back button */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="w-[38px] h-[38px] rounded-full flex items-center justify-center
+                       bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 shrink-0"
+          >
+            <Menu size={16} className="text-primary dark:text-white" />
+          </button>
+
+          {/* Title */}
+          <span className="font-outfit font-bold text-[20px] text-primary dark:text-white tracking-[-0.4px] leading-[1.15] flex-1">
+            Watchlist
+          </span>
+
+          {/* Actions */}
+          {deletionMode ? (
+            <button
+              onClick={() => setDeletionMode(false)}
+              className="flex items-center gap-1.5 px-4 py-[9px] rounded-[12px] border
+                         bg-red-500/8 dark:bg-red-500/12 border-red-500/28 text-red-400
+                         font-inter font-semibold text-[13px]"
+            >
+              Cancel
+            </button>
+          ) : (
+            <>
+              {/* Add */}
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="w-10 h-10 rounded-full flex items-center justify-center
+                           bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10"
+              >
+                <Plus size={19} className="text-primary dark:text-white" />
+              </button>
+              {/* Delete */}
+              <button
+                onClick={() => setDeletionMode(true)}
+                className="w-10 h-10 rounded-full flex items-center justify-center
+                           bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10"
+              >
+                <Trash2 size={17} className="text-text-secondary-light dark:text-text-secondary-dark" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Column headers */}
+      <div className="pt-2 pb-0 shrink-0">
+        <MobileColumnHeaders deletionMode={deletionMode} />
+      </div>
+
+      {/* List */}
+      <div className="flex-1 overflow-y-auto pt-2 pb-8 min-h-0">
+        {items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 gap-5 px-8">
+            <BarChart2 size={52} className="text-primary/22 dark:text-white/22" />
+            <div className="text-center">
+              <p className="font-outfit font-bold text-[18px] text-text-secondary-light dark:text-text-secondary-dark">
+                No stocks tracked yet
+              </p>
+              <p className="font-inter font-medium text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-2.5">
+                Tap + to add your first stock
+              </p>
+            </div>
+          </div>
+        ) : (
+          <AnimatePresence mode="popLayout">
+            {items.map((item) => (
+              <MobileWatchCard
+                key={item.ticker}
+                item={item}
+                deletionMode={deletionMode}
+                onDelete={() => handleRemove(item.ticker)}
+                onTap={() => handleRowTap(item.ticker)}
+              />
+            ))}
+          </AnimatePresence>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Page Export ─────────────────────────────────────────────────────────
+export default function WatchlistPage() {
+  const router = useRouter();
+  const [items, setItems] = useState<WatchlistItem[]>(INITIAL_WATCHLIST);
+  const [deletionMode, setDeletionMode] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const handleRemove = (ticker: string) =>
+    setItems((p) => p.filter((i) => i.ticker !== ticker));
+
+  const handleAdd = (item: WatchlistItem) =>
+    setItems((p) => (p.find((i) => i.ticker === item.ticker) ? p : [...p, item]));
+
+  const handleRowTap = (ticker: string) => {
+    router.push(`/?q=Analyze+${ticker}`);
+  };
+
+  const sharedProps = {
+    items,
+    deletionMode,
+    setDeletionMode,
+    setShowAddModal,
+    handleRemove,
+    handleRowTap,
+  };
+
+  return (
+    <div className="h-full">
+      {/* Desktop */}
+      <DesktopWatchlist {...sharedProps} />
+      {/* Mobile */}
+      <MobileWatchlist {...sharedProps} />
+
+      {/* Shared add stock modal */}
       <AnimatePresence>
         {showAddModal && (
           <AddStockModal

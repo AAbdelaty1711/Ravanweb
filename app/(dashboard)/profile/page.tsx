@@ -667,16 +667,27 @@ function DesktopProfileLayout({
                 key={id}
                 onClick={() => setActiveSection(id)}
                 className={cn(
-                  'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all font-inter font-medium text-[13px]',
+                  'relative w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left font-inter font-medium text-[13px] transition-colors',
                   activeSection === id
-                    ? 'bg-primary/8 dark:bg-white/8 text-primary dark:text-white'
+                    ? 'text-primary dark:text-white'
                     : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/[0.04] hover:text-text-primary-light dark:hover:text-text-primary-dark'
                 )}
               >
-                <Icon size={15} className="shrink-0" />
-                {label}
                 {activeSection === id && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary dark:bg-white" />
+                  <motion.div
+                    layoutId="profile-nav-pill"
+                    className="absolute inset-0 rounded-xl bg-primary/8 dark:bg-white/8"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                  />
+                )}
+                <Icon size={15} className="shrink-0 relative z-10" />
+                <span className="flex-1 relative z-10">{label}</span>
+                {activeSection === id && (
+                  <motion.div
+                    layoutId="profile-nav-dot"
+                    className="ml-auto w-1.5 h-1.5 rounded-full bg-primary dark:bg-white relative z-10"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                  />
                 )}
               </button>
             ))}
