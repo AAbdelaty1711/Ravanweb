@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
@@ -187,21 +187,11 @@ function EditModal({ name, onSave, onClose }: { name: string; onSave: (n: string
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
-  const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const [name, setName] = useState("Ahmed Abdelaty");
   const [notifEnabled, setNotifEnabled] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
   const [language, setLanguage] = useState("English");
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return <div className="flex flex-col h-full market-pattern" />;
-  }
-
   const isDark = theme === "dark";
 
   return (
