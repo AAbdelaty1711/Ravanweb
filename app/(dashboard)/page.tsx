@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, ArrowUp, Sparkles, TrendingUp, BarChart2, Zap } from "lucide-react";
+import { Send, ArrowUp, Sparkles, TrendingUp, BarChart2, Zap, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { RavenMark } from "@/components/ui/RavenMark";
+import { useSidebar } from "@/components/SidebarContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -285,6 +286,7 @@ function ChatInput({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ChatPage() {
+  const { setMobileOpen } = useSidebar();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -330,7 +332,13 @@ export default function ChatPage() {
     <div className="flex flex-col h-full market-pattern">
       {/* ── Mobile header (visible on small screens, hidden on desktop) ── */}
       <div className="flex items-center justify-center h-14 border-b border-border-light dark:border-[#141414]
-                      bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md lg:hidden px-4 shrink-0">
+                      bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md lg:hidden px-4 shrink-0 relative">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="absolute left-4 w-10 h-10 flex items-center justify-center text-primary dark:text-white"
+        >
+          <Menu size={20} />
+        </button>
         <div className="flex items-center gap-2">
           <RavenMark size={20} className="text-primary dark:text-white" />
           <span className="font-outfit font-bold text-[18px] text-primary dark:text-white">

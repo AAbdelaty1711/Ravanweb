@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --color-primary: #0B1F3A;
+    --color-primary: #0b1f3a;
     --color-primary-hover: #0d2548;
-    --color-bg: #F4F6F9;
-    --color-bg-muted: #EEF1F5;
-    --color-bg-card: #FFFFFF;
-    --color-border: #E2E6ED;
-    --color-border-subtle: #F0F2F5;
-    --color-border-strong: rgba(11,31,58,0.12);
-    --color-text-primary: #0B1F3A;
-    --color-text-secondary: #6B7280;
-    --color-text-tertiary: #9CA3AF;
+    --color-bg: #f4f6f9;
+    --color-bg-muted: #eef1f5;
+    --color-bg-card: #ffffff;
+    --color-border: #e2e6ed;
+    --color-border-subtle: #f0f2f5;
+    --color-border-strong: rgba(11, 31, 58, 0.12);
+    --color-text-primary: #0b1f3a;
+    --color-text-secondary: #6b7280;
+    --color-text-tertiary: #9ca3af;
     --color-input-bg: rgba(0, 0, 0, 0.035);
     --color-input-border: rgba(0, 0, 0, 0);
     --color-input-border-focus: rgba(11, 31, 58, 0.5);
-    --color-bull: #34C759;
-    --color-bear: #FF453A;
-    --color-warning: #FF9F0A;
+    --color-bull: #34c759;
+    --color-bear: #ff453a;
+    --color-warning: #ff9f0a;
     --sidebar-width: 280px;
     --sidebar-collapsed: 72px;
     --transition-fast: 160ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -31,21 +31,23 @@
   .dark {
     --color-primary: #FFFFFF;
     --color-primary-hover: rgba(255, 255, 255, 0.85);
-    --color-bg: #0A0A0F;
-    --color-bg-muted: #0F0F14;
-    --color-bg-card: #111118;
-    --color-border: #1C1C28;
+    --color-bg: #0D0D0D;
+    --color-bg-muted: #141414;
+    --color-bg-card: #121212;
+    --color-border: #1F1F1F;
     --color-border-subtle: #181820;
-    --color-border-strong: rgba(255, 255, 255, 0.10);
-    --color-text-primary: #F0F2F8;
-    --color-text-secondary: #8892A4;
-    --color-text-tertiary: #5A6478;
+    --color-border-strong: rgba(255, 255, 255, 0.1);
+    --color-text-primary: #f0f2f8;
+    --color-text-secondary: #8892a4;
+    --color-text-tertiary: #5a6478;
     --color-input-bg: rgba(255, 255, 255, 0.04);
     --color-input-border: rgba(255, 255, 255, 0);
     --color-input-border-focus: rgba(255, 255, 255, 0.5);
   }
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   html {
     -webkit-font-smoothing: antialiased;
@@ -59,39 +61,53 @@
     font-family: var(--font-inter), system-ui, sans-serif;
   }
 
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
   ::-webkit-scrollbar-thumb {
     background: var(--color-border-strong);
     border-radius: 3px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary);
+  }
 
   ::selection {
     background: rgba(11, 31, 58, 0.15);
     color: var(--color-text-primary);
   }
-  .dark ::selection { background: rgba(255, 255, 255, 0.15); }
+  .dark ::selection {
+    background: rgba(255, 255, 255, 0.15);
+  }
 }
 
 /* ─── Rich Trading Background Pattern ─────────────────────────────────────── */
 /* Full OHLC candlesticks with wicks + volume bars + trend line + MA dashes   */
 @layer utilities {
   .market-pattern {
-    background-color: #F4F6F9;
+    background-color: #f4f6f9;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- Grid Dots --%3E%3Ccircle cx='10' cy='10' r='0.5' fill='%230B1F3A' fill-opacity='0.02'/%3E%3Ccircle cx='110' cy='110' r='0.5' fill='%230B1F3A' fill-opacity='0.02'/%3E%3Ccircle cx='210' cy='210' r='0.5' fill='%230B1F3A' fill-opacity='0.02'/%3E%3Ccircle cx='310' cy='10' r='0.5' fill='%230B1F3A' fill-opacity='0.02'/%3E%3C!-- Interweaving Flow Lines --%3E%3Cpath d='M0,220 Q100,180 200,220 T400,180' stroke='%230B1F3A' stroke-width='0.8' stroke-opacity='0.04'/%3E%3Cpath d='M0,100 Q150,150 300,80 T500,120' stroke='%230B1F3A' stroke-width='0.6' stroke-opacity='0.03'/%3E%3Cpath d='M50,300 Q150,200 250,280 T450,220' stroke='%230B1F3A' stroke-width='0.5' stroke-opacity='0.02'/%3E%3C!-- Technical Markers --%3E%3Cpath d='M30,50 l10,10 M40,50 l-10,10' stroke='%230B1F3A' stroke-width='0.5' stroke-opacity='0.05'/%3E%3Cpath d='M350,250 l8,0 M354,-4 v8' stroke='%230B1F3A' stroke-width='0.5' stroke-opacity='0.05' transform='translate(0,254)'/%3E%3C!-- Data Nodes --%3E%3Ccircle cx='40' cy='210' r='2' fill='%230B1F3A' fill-opacity='0.06'/%3E%3Ccircle cx='180' cy='215' r='1.2' fill='%230B1F3A' fill-opacity='0.04'/%3E%3Ccircle cx='320' cy='170' r='2.5' fill='%230B1F3A' fill-opacity='0.05'/%3E%3Ccircle cx='120' cy='80' r='1.5' fill='%230B1F3A' fill-opacity='0.04'/%3E%3Ccircle cx='280' cy='110' r='2' fill='%230B1F3A' fill-opacity='0.06'/%3E%3Ccircle cx='150' cy='150' r='1' fill='%230B1F3A' fill-opacity='0.03'/%3E%3Ccircle cx='380' cy='40' r='1.5' fill='%230B1F3A' fill-opacity='0.04'/%3E%3C!-- Tiny Bar Spark --%3E%3Crect x='220' y='240' width='3' height='10' rx='0.5' fill='%230B1F3A' fill-opacity='0.04'/%3E%3Crect x='225' y='235' width='3' height='15' rx='0.5' fill='%230B1F3A' fill-opacity='0.05'/%3E%3Crect x='230' y='242' width='3' height='8' rx='0.5' fill='%230B1F3A' fill-opacity='0.04'/%3E%3C/g%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 400px 300px;
   }
 
   .dark .market-pattern {
-    background-color: #0A0A0F;
+    background-color: #0D0D0D;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- Grid Dots --%3E%3Ccircle cx='10' cy='10' r='0.5' fill='%23ffffff' fill-opacity='0.015'/%3E%3Ccircle cx='110' cy='110' r='0.5' fill='%23ffffff' fill-opacity='0.015'/%3E%3Ccircle cx='210' cy='210' r='0.5' fill='%23ffffff' fill-opacity='0.015'/%3E%3C!-- Interweaving Flow Lines --%3E%3Cpath d='M0,220 Q100,180 200,220 T400,180' stroke='%23ffffff' stroke-width='0.8' stroke-opacity='0.03'/%3E%3Cpath d='M0,100 Q150,150 300,80 T500,120' stroke='%23ffffff' stroke-width='0.6' stroke-opacity='0.02'/%3E%3Cpath d='M50,300 Q150,200 250,280 T450,220' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.015'/%3E%3C!-- Technical Markers --%3E%3Cpath d='M30,50 l10,10 M40,50 l-10,10' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.04'/%3E%3Cpath d='M350,250 l8,0 M354,-4 v8' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.04' transform='translate(0,254)'/%3E%3C!-- Data Nodes --%3E%3Ccircle cx='40' cy='210' r='2' fill='%23ffffff' fill-opacity='0.04'/%3E%3Ccircle cx='180' cy='215' r='1.2' fill='%23ffffff' fill-opacity='0.03'/%3E%3Ccircle cx='320' cy='170' r='2.5' fill='%23ffffff' fill-opacity='0.035'/%3E%3Ccircle cx='120' cy='80' r='1.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3Ccircle cx='280' cy='110' r='2' fill='%23ffffff' fill-opacity='0.04'/%3E%3Ccircle cx='150' cy='150' r='1' fill='%23ffffff' fill-opacity='0.02'/%3E%3Ccircle cx='380' cy='40' r='1.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3C!-- Tiny Bar Spark --%3E%3Crect x='220' y='240' width='3' height='10' rx='0.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3Crect x='225' y='235' width='3' height='15' rx='0.5' fill='%23ffffff' fill-opacity='0.04'/%3E%3Crect x='230' y='242' width='3' height='8' rx='0.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 400px 300px;
   }
 
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* ─── Component utilities ─────────────────────────────────────────────── */
@@ -152,8 +168,12 @@
 }
 
 /* ─── Typography helpers ───────────────────────────────────────────────── */
-.font-outfit { font-family: var(--font-outfit), system-ui, sans-serif; }
-.font-inter  { font-family: var(--font-inter), system-ui, sans-serif; }
+.font-outfit {
+  font-family: var(--font-outfit), system-ui, sans-serif;
+}
+.font-inter {
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
 
 /* ─── Drawer overlay ───────────────────────────────────────────────────── */
 .drawer-overlay {

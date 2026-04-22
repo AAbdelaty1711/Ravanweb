@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   BellOff,
   CheckCheck,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/components/SidebarContext";
 import { NOTIFICATIONS } from "@/lib/mock-data";
 import type { RavenNotification, NotificationType } from "@/lib/types";
 
@@ -105,6 +107,7 @@ const FILTER_KEYS = ["All", "Unread", "AI Radar"] as const;
 type FilterKey = (typeof FILTER_KEYS)[number];
 
 export default function NotificationsPage() {
+  const { setMobileOpen } = useSidebar();
   const [notifications, setNotifications] = useState<RavenNotification[]>(NOTIFICATIONS);
   const [activeFilter, setActiveFilter] = useState<FilterKey>("All");
 
@@ -127,28 +130,36 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="px-5 pt-5 pb-3.5 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4 mb-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
-                Notifications
-              </h1>
-              <AnimatePresence>
-                {unreadCount > 0 && (
-                  <motion.span
-                    initial={{ scale: 0.7 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0.7 }}
-                    className="px-2 py-0.5 rounded-full font-inter font-bold text-[11px]
-                               bg-primary/10 dark:bg-white/15 text-primary dark:text-white"
-                  >
-                    {unreadCount}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/[0.06] text-primary dark:text-white"
+            >
+              <Menu size={18} />
+            </button>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
+                  Notifications
+                </h1>
+                <AnimatePresence>
+                  {unreadCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0.7 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0.7 }}
+                      className="px-2 py-0.5 rounded-full font-inter font-bold text-[11px]
+                                 bg-primary/10 dark:bg-white/15 text-primary dark:text-white"
+                    >
+                      {unreadCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </div>
+              <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
+                Price alerts, AI signals, and market updates
+              </p>
             </div>
-            <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
-              Price alerts, AI signals, and market updates
-            </p>
           </div>
           {unreadCount > 0 && (
             <button

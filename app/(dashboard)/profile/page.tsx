@@ -26,9 +26,11 @@ import {
   Camera,
   Zap,
   AlertTriangle,
+  Menu,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
+import { useSidebar } from '@/components/SidebarContext'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared helpers
@@ -854,12 +856,19 @@ function MobileProfileLayout({
   language: string
   setLanguage: (l: string) => void
 }) {
+  const { setMobileOpen } = useSidebar()
   const [showEdit, setShowEdit] = useState(false)
 
   return (
     <div className="lg:hidden flex flex-col h-full market-pattern">
       {/* Header — matches Flutter style */}
       <div className="flex items-center justify-center h-[56px] relative border-b border-gray-100 dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm shrink-0 px-4">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="absolute left-4 w-10 h-10 flex items-center justify-center text-primary dark:text-white"
+        >
+          <Menu size={20} />
+        </button>
         <span className="font-outfit font-bold text-[18px] text-primary dark:text-white tracking-wide">
           Profile
         </span>

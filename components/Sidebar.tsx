@@ -369,23 +369,15 @@ function HistorySection({
   );
 }
 
+import { useSidebar } from "./SidebarContext";
+
 // ─── Main export: Desktop sidebar + Mobile drawer ─────────────────────────────
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { mobileOpen, setMobileOpen } = useSidebar();
 
   return (
     <>
-      {/* Mobile hamburger button */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-3.5 left-4 z-40 w-9 h-9 rounded-xl flex items-center justify-center
-                   bg-white dark:bg-[#111118] border border-gray-200 dark:border-white/10 shadow-sm"
-        aria-label="Open menu"
-      >
-        <Menu size={17} className="text-primary dark:text-white" />
-      </button>
-
       {/* Mobile drawer overlay */}
       <AnimatePresence>
         {mobileOpen && (

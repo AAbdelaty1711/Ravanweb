@@ -14,8 +14,10 @@ import {
   CheckCircle2,
   BarChart2,
   MessageSquare,
+  Menu,
 } from "lucide-react";
 import { cn, formatPrice, formatPct, stockFaviconUrl } from "@/lib/utils";
+import { useSidebar } from "@/components/SidebarContext";
 import { INITIAL_WATCHLIST, ALL_STOCKS } from "@/lib/mock-data";
 import type { WatchlistItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
@@ -280,6 +282,7 @@ function AddStockModal({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function WatchlistPage() {
+  const { setMobileOpen } = useSidebar();
   const router = useRouter();
   const [items, setItems] = useState<WatchlistItem[]>(INITIAL_WATCHLIST);
   const [deletionMode, setDeletionMode] = useState(false);
@@ -298,13 +301,21 @@ export default function WatchlistPage() {
       {/* Header */}
       <div className="px-5 pt-5 pb-4 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
-              Watchlist
-            </h1>
-            <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
-              {items.length} stock{items.length !== 1 ? "s" : ""} tracked · tap a row to ask AI
-            </p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/[0.06] text-primary dark:text-white"
+            >
+              <Menu size={18} />
+            </button>
+            <div>
+              <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
+                Watchlist
+              </h1>
+              <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
+                {items.length} stock{items.length !== 1 ? "s" : ""} tracked · tap a row to ask AI
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {deletionMode ? (

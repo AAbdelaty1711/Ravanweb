@@ -9,8 +9,10 @@ import {
   BellRing,
   Sparkles,
   Zap,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/components/SidebarContext";
 import { RADAR_ITEMS } from "@/lib/mock-data";
 import type { RadarAnomaly, RadarAction } from "@/lib/types";
 import { useRouter } from "next/navigation";
@@ -176,6 +178,7 @@ function RadarCard({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AIRadarPage() {
+  const { setMobileOpen } = useSidebar();
   const router = useRouter();
   const [actionFilter, setActionFilter] = useState("All");
   const [showingHistory, setShowingHistory] = useState(false);
@@ -225,19 +228,27 @@ export default function AIRadarPage() {
       {/* Header */}
       <div className="px-5 pt-5 pb-3.5 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4 mb-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
-                AI Radar
-              </h1>
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span className="font-inter font-semibold text-[10px] text-green-600 dark:text-green-400">Live</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/[0.06] text-primary dark:text-white"
+            >
+              <Menu size={18} />
+            </button>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
+                  AI Radar
+                </h1>
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  <span className="font-inter font-semibold text-[10px] text-green-600 dark:text-green-400">Live</span>
+                </div>
               </div>
+              <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
+                {filtered.length} signal{filtered.length !== 1 ? "s" : ""} active
+              </p>
             </div>
-            <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
-              {filtered.length} signal{filtered.length !== 1 ? "s" : ""} active
-            </p>
           </div>
           <button
             onClick={() => setShowingHistory(!showingHistory)}
