@@ -15,6 +15,8 @@ import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { RavenMark } from '@/components/ui/RavenMark'
 import { useSidebar } from '@/components/SidebarContext'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -63,21 +65,21 @@ const PROMPT_CARDS = [
 function generateAIResponse(query: string): string {
   const q = query.toLowerCase()
   if (q.includes('aapl') || q.includes('apple')) {
-    return 'AAPL is trading at $189.30, showing bullish momentum. Current price action suggests a push toward T1 at $198.00, backed by strong institutional accumulation. The Golden Cross on the daily chart confirms the uptrend. Disciplined entry near $187–190 with a stop below $184 offers a favorable risk/reward setup.'
+    return '### Apple Inc. (AAPL) Analysis\n\n**AAPL** is trading at `$189.30`, showing bullish momentum. \n\n*   **Target 1:** $198.00\n*   **Support:** $184.00\n\nThe `Golden Cross` on the daily chart confirms the uptrend. \n\n```python\n# Momentum Signal\nif price > sma_200:\n    return "Bullish"\n```'
   }
   if (q.includes('nvda') || q.includes('nvidia')) {
-    return 'NVDA continues to be a dominant force in AI infrastructure. At $875.20, momentum indicators (MACD, RSI) remain bullish. T1 sits at $920, T2 at $980. High volume surges over the past 3 sessions confirm institutional buying. However, the RSI at 72 signals slight overbought territory — consider scaling in on any pullback to $840–850.'
+    return '### NVIDIA (NVDA) Outlook\n\n**NVDA** continues to be a dominant force in AI infrastructure. At `$875.20`, momentum indicators (MACD, RSI) remain bullish.\n\n| Level | Price | Signal |\n| :--- | :--- | :--- |\n| T1 | $920 | Strong |\n| T2 | $980 | Moderate |\n\nHigh volume surges over the past 3 sessions confirm institutional buying. However, the RSI at `72` signals slight overbought territory.'
   }
   if (q.includes('tsla') || q.includes('tesla')) {
-    return 'TSLA faces headwinds at $248.50. The Death Cross on the weekly chart and insider selling signal caution. T1 downside target at $230, T2 at $215. Avoid new long positions until the stock reclaims the 50-day MA at $262. Risk management is critical here.'
+    return '### Tesla (TSLA) Caution\n\n**TSLA** faces headwinds at `$248.50`. The `Death Cross` on the weekly chart and insider selling signal caution.\n\n> "Risk management is critical here. Avoid new long positions until the stock reclaims the 50-day MA at $262."\n\n*   **Downside T1:** $230\n*   **Downside T2:** $215'
   }
   if (q.includes('market') || q.includes('summary')) {
-    return "Today's market shows mixed signals. NVDA and AMD leading tech higher on AI enthusiasm (+2.1%, +1.8%). TSLA and META lagging. The S&P 500 consolidates near all-time highs with low volatility (VIX at 14.2). Watch the Fed minutes release at 2PM ET — any hawkish surprise could trigger a rotation out of growth."
+    return "### Market Summary\n\nToday's market shows **mixed signals**. \n\n*   **Leaders:** `NVDA` (+2.1%) and `AMD` (+1.8%)\n*   **Laggards:** `TSLA` and `META` \n\nThe S&P 500 consolidates near all-time highs with low volatility (VIX at `14.2`). Watch the Fed minutes release at **2PM ET**."
   }
   if (q.includes('radar') || q.includes('signal')) {
-    return 'Top Raven AI Radar signals today: 🟢 NVDA — Golden Cross + High Volume (BUY). 🟢 PLTR — RSI Oversold bounce + Earnings Beat (BUY). 🟡 COIN — Gap Up with caution (WATCH). 🔴 TSLA — Death Cross + insider selling (AVOID). 🟢 SHOP — Breakout confirmed (BUY).'
+    return '### Raven AI Radar Highlights\n\n| Ticker | Signal | Action |\n| :--- | :--- | :--- |\n| **NVDA** | Golden Cross | 🟢 BUY |\n| **PLTR** | RSI Oversold | 🟢 BUY |\n| **TSLA** | Death Cross | 🔴 AVOID |\n| **SHOP** | Breakout | 🟢 BUY |'
   }
-  return `Analyzing "${query}"… Raven AI is scanning momentum indicators, volume anomalies, and sentiment signals. AAPL and TSLA show diverging momentum — AAPL trending ↑ while TSLA consolidates under resistance. Broader indices hold steady. Position sizing discipline is key in the current macro environment.`
+  return `### Analysis for "${query}"\n\nRaven AI is scanning momentum indicators, volume anomalies, and sentiment signals. \n\n**Key Takeaway:** Broader indices hold steady, but position sizing discipline is key. Use the \`/radar\` command for more specific signals.`
 }
 
 // ─── Thinking dots indicator ──────────────────────────────────────────────────
@@ -101,13 +103,10 @@ function ThinkingDots() {
   )
 }
 
+
+
 // ─── AI bubble (with Raven avatar) ───────────────────────────────────────────
 function AIBubble({ text }: { text: string }) {
-  // Highlight tickers and direction arrows
-  const highlighted = text.split(
-    /(\b(?:AAPL|NVDA|TSLA|MSFT|META|AMZN|GOOGL|PLTR|AMD|COIN|SHOP|SPOT|UBER|INTC|NFLX)\b|↑|↓)/g
-  )
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -123,36 +122,117 @@ function AIBubble({ text }: { text: string }) {
         <RavenMark size={20} className="text-primary dark:text-white" />
       </div>
 
-      {/* Text */}
-      <div
-        className="font-inter text-[14px] text-text-primary-light dark:text-text-primary-dark leading-[1.6]
-                      pt-1"
-      >
-        {highlighted.map((part, i) => {
-          if (/^[A-Z]{2,6}$/.test(part) && part !== 'AI') {
-            return (
+      {/* Text with Markdown Rendering */}
+      <div className="flex-1 pt-1 overflow-hidden">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            // Paragraphs: block-level but tightly controlled spacing
+            p: ({ children }) => (
+              <p className="font-inter text-[14px] text-text-primary-light dark:text-text-primary-dark leading-relaxed mb-3 last:mb-0 w-full">
+                {children}
+              </p>
+            ),
+            // Bold: branded primary color
+            strong: ({ children }) => (
+              <strong className="font-bold text-primary dark:text-white">
+                {children}
+              </strong>
+            ),
+            em: ({ children }) => (
+              <em className="italic text-text-secondary-light dark:text-text-secondary-dark">
+                {children}
+              </em>
+            ),
+            // Inline code: ALWAYS a span-like inline element, never block
+            code: ({ children, ...props }: any) => (
               <span
-                key={i}
-                className="font-semibold text-primary dark:text-white"
+                className="inline px-1.5 py-0.5 rounded-md bg-black/10 dark:bg-white/10 font-mono text-[13px] text-primary dark:text-white"
+                {...props}
               >
-                {part}
+                {children}
               </span>
-            )
-          }
-          if (part === '↑')
-            return (
-              <span key={i} className="text-bull font-semibold">
-                {part}
-              </span>
-            )
-          if (part === '↓')
-            return (
-              <span key={i} className="text-bear font-semibold">
-                {part}
-              </span>
-            )
-          return <span key={i}>{part}</span>
-        })}
+            ),
+            // Block code: pre wraps everything, code inside is unstyled
+            pre: ({ children }) => (
+              <pre className="my-3 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.05] border border-black/5 dark:border-white/5 overflow-x-auto font-mono text-[13px] text-text-primary-light dark:text-text-primary-dark shadow-sm">
+                {children}
+              </pre>
+            ),
+            ul: ({ children }) => (
+              <ul className="mb-3 pl-4 space-y-1 list-disc list-outside text-text-primary-light dark:text-text-primary-dark">
+                {children}
+              </ul>
+            ),
+            ol: ({ children }) => (
+              <ol className="mb-3 pl-4 space-y-1 list-decimal list-outside text-text-primary-light dark:text-text-primary-dark">
+                {children}
+              </ol>
+            ),
+            li: ({ children }) => (
+              <li className="font-inter text-[14px] leading-relaxed">
+                {children}
+              </li>
+            ),
+            h1: ({ children }) => (
+              <h1 className="font-outfit font-bold text-[18px] text-primary dark:text-white mb-3 leading-snug">
+                {children}
+              </h1>
+            ),
+            h2: ({ children }) => (
+              <h2 className="font-outfit font-bold text-[16px] text-primary dark:text-white mb-2 mt-4 leading-snug">
+                {children}
+              </h2>
+            ),
+            h3: ({ children }) => (
+              <h3 className="font-outfit font-semibold text-[14px] text-primary dark:text-white mb-2 mt-3 leading-snug">
+                {children}
+              </h3>
+            ),
+            a: ({ children, href }) => (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary dark:text-blue-400 underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-all"
+              >
+                {children}
+              </a>
+            ),
+            blockquote: ({ children }) => (
+              <blockquote className="border-l-2 border-primary/30 dark:border-white/20 pl-3 py-0.5 my-3 text-text-secondary-light dark:text-text-secondary-dark">
+                {children}
+              </blockquote>
+            ),
+            table: ({ children }) => (
+              <div className="my-3 overflow-x-auto rounded-xl border border-black/5 dark:border-white/5">
+                <table className="w-full text-left text-[13px] border-collapse">
+                  {children}
+                </table>
+              </div>
+            ),
+            thead: ({ children }) => (
+              <thead className="bg-black/5 dark:bg-white/5 font-semibold">
+                {children}
+              </thead>
+            ),
+            th: ({ children }) => (
+              <th className="px-4 py-2 border-b border-black/5 dark:border-white/5 text-text-primary-light dark:text-text-primary-dark">
+                {children}
+              </th>
+            ),
+            td: ({ children }) => (
+              <td className="px-4 py-2 border-b border-black/5 dark:border-white/5 text-text-primary-light dark:text-text-primary-dark">
+                {children}
+              </td>
+            ),
+            hr: () => (
+              <hr className="my-4 border-black/5 dark:border-white/5" />
+            ),
+          }}
+        >
+          {text}
+        </ReactMarkdown>
       </div>
     </motion.div>
   )
