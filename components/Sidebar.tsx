@@ -248,14 +248,6 @@ function SidebarContent({
                   ? "text-primary dark:text-white"
                   : "text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/[0.04] dark:hover:bg-white/[0.04] hover:text-text-primary-light dark:hover:text-text-primary-dark"
               )}>
-                {/* Sliding background pill */}
-                {active && (
-                  <motion.div
-                    layoutId="sidebar-active-pill"
-                    className="absolute inset-0 rounded-xl bg-primary/[0.08] dark:bg-white/[0.08]"
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                  />
-                )}
                 <Icon size={16} className="shrink-0 relative z-10" />
                 <AnimatePresence>
                   {!collapsed && (
