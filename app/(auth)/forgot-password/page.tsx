@@ -1,36 +1,50 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
+  const router = useRouter()
+  const [email, setEmail] = useState('')
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full max-w-sm"
+      className="w-full max-w-[420px] md:max-w-[520px]"
     >
-      <div className="bg-card-light dark:bg-card-dark rounded-[24px]
-                      border border-border-light dark:border-border-dark
-                      shadow-[0_8px_32px_rgba(11,31,58,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-                      px-7 py-10">
-        <h1 className="font-inter font-bold text-[18px] text-text-primary-light dark:text-text-primary-dark text-center">
-          Forgot Password
-        </h1>
-        <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark text-center mt-2 mb-9">
-          Enter your email to receive a reset code
-        </p>
+      <div
+        className="bg-card-light dark:bg-card-dark rounded-[32px]
+                   border border-border-light dark:border-border-dark
+                   shadow-[0_8px_40px_rgba(11,31,58,0.08)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)]
+                   px-6 py-8 md:px-12 md:py-10"
+      >
+        {/* Branding Section */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-1">
+            <h1 className="font-outfit font-bold text-[26px] md:text-[32px] text-primary dark:text-white tracking-tight">
+              Raven AI
+            </h1>
+            <img
+              src="/ravanlogo.png"
+              alt="Raven AI"
+              className="w-12 h-12 md:w-14 md:h-14 object-contain"
+            />
+          </div>
+          <p className="font-inter text-[13px] md:text-[14px] text-text-secondary-light dark:text-text-secondary-dark opacity-60">
+            Recover your account access
+          </p>
+        </div>
 
         <div className="mb-7">
-          <label className="block font-inter font-medium text-[11px] tracking-[0.5px] uppercase
-                             text-text-secondary-light dark:text-text-secondary-dark mb-2">
+          <label
+            className="block font-inter font-medium text-[11px] tracking-[0.5px] uppercase
+                             text-text-secondary-light dark:text-text-secondary-dark mb-2"
+          >
             Email Address
           </label>
           <input
@@ -39,12 +53,12 @@ export default function ForgotPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="name@example.com"
             className={cn(
-              "w-full px-4 py-[18px] rounded-[12px] font-inter text-[14px]",
-              "bg-transparent border border-primary-DEFAULT/15 dark:border-gray-600/30",
-              "text-text-primary-light dark:text-text-primary-dark",
-              "placeholder:text-gray-400 dark:placeholder:text-gray-600",
-              "outline-none focus:border-primary-DEFAULT dark:focus:border-white/60",
-              "transition-colors duration-150"
+              'w-full px-4 py-[18px] rounded-[12px] font-inter text-[14px]',
+              'bg-transparent border border-primary/15 dark:border-gray-600/30',
+              'text-text-primary-light dark:text-text-primary-dark',
+              'placeholder:text-gray-400 dark:placeholder:text-gray-600',
+              'outline-none focus:border-primary dark:focus:border-white/60',
+              'transition-colors duration-150'
             )}
           />
         </div>
@@ -52,10 +66,10 @@ export default function ForgotPasswordPage() {
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => router.push("/verify?next=reset-password")}
+          onClick={() => router.push('/verify?next=reset-password')}
           className="w-full h-[52px] rounded-[12px] flex items-center justify-center
-                     bg-primary-DEFAULT dark:bg-white
-                     text-white dark:text-primary-DEFAULT
+                     bg-primary dark:bg-white
+                     text-white dark:text-primary
                      font-inter font-bold text-[13px]
                      transition-opacity hover:opacity-90"
         >
@@ -72,5 +86,5 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </motion.div>
-  );
+  )
 }

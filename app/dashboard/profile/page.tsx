@@ -28,9 +28,11 @@ import {
   AlertTriangle,
   Menu,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import { useSidebar } from '@/components/SidebarContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared helpers
@@ -51,6 +53,7 @@ function Toggle({
   onChange: (v: boolean) => void
   accentColor?: string
 }) {
+  const { isRTL } = useLanguage()
   return (
     <button
       onClick={() => onChange(!value)}
@@ -62,7 +65,7 @@ function Toggle({
       aria-checked={value}
     >
       <motion.div
-        animate={{ x: value ? 17 : 2 }}
+        animate={{ x: value ? (isRTL ? -17 : 17) : isRTL ? -2 : 2 }}
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
         className="absolute top-[3px] w-4 h-4 rounded-full bg-white dark:bg-black shadow-sm"
       />
@@ -85,6 +88,7 @@ function EditModal({
 }) {
   const [nameVal, setNameVal] = useState(name)
   const [pwVal, setPwVal] = useState('')
+  const { dict } = useLanguage()
 
   return (
     <motion.div
@@ -116,7 +120,7 @@ function EditModal({
           </button>
         </div>
         <div className="space-y-4 mb-5">
-          <div>
+          <div className="text-start">
             <label className="block font-inter text-[11px] font-semibold text-text-secondary-light dark:text-text-secondary-dark mb-1.5 uppercase tracking-wide">
               Full Name
             </label>
@@ -128,7 +132,7 @@ function EditModal({
                          outline-none focus:border-primary/50 dark:focus:border-white/30 transition-colors"
             />
           </div>
-          <div>
+          <div className="text-start">
             <label className="block font-inter text-[11px] font-semibold text-text-secondary-light dark:text-text-secondary-dark mb-1.5 uppercase tracking-wide">
               New Password
             </label>
@@ -152,7 +156,7 @@ function EditModal({
           className="w-full h-10 rounded-xl bg-primary dark:bg-white text-white dark:text-black
                      font-inter font-bold text-[13px] transition-opacity hover:opacity-90"
         >
-          Save Changes
+          {dict.preferences.saveChanges}
         </button>
       </motion.div>
     </motion.div>
@@ -170,15 +174,6 @@ type DesktopSection =
   | 'subscription'
   | 'about'
 
-const DESKTOP_NAV: { id: DesktopSection; icon: typeof User; label: string }[] =
-  [
-    { id: 'account', icon: User, label: 'Account' },
-    { id: 'preferences', icon: Settings, label: 'Preferences' },
-    { id: 'security', icon: Lock, label: 'Security' },
-    { id: 'subscription', icon: Crown, label: 'Subscription' },
-    { id: 'about', icon: HelpCircle, label: 'About & Legal' },
-  ]
-
 function DesktopFormField({
   label,
   value,
@@ -192,7 +187,7 @@ function DesktopFormField({
 }) {
   const [val, setVal] = useState(value)
   return (
-    <div>
+    <div className="text-start">
       <label className="block font-inter text-[11px] font-semibold uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark mb-1.5">
         {label}
       </label>
@@ -235,7 +230,7 @@ function DesktopToggleRow({
             className="text-text-secondary-light dark:text-text-secondary-dark"
           />
         </div>
-        <div>
+        <div className="text-start">
           <p className="font-inter font-semibold text-[13.5px] text-text-primary-light dark:text-text-primary-dark">
             {label}
           </p>
@@ -257,8 +252,6 @@ function DesktopSectionContent({
   setTheme,
   notifEnabled,
   setNotifEnabled,
-  language,
-  setLanguage,
 }: {
   section: DesktopSection
   name: string
@@ -267,10 +260,9 @@ function DesktopSectionContent({
   setTheme: (t: string) => void
   notifEnabled: boolean
   setNotifEnabled: (v: boolean) => void
-  language: string
-  setLanguage: (l: string) => void
 }) {
   const [saved, setSaved] = useState(false)
+  const { dict, language, setLanguage } = useLanguage()
 
   const handleSave = () => {
     setSaved(true)
@@ -279,7 +271,7 @@ function DesktopSectionContent({
 
   if (section === 'account')
     return (
-      <div>
+      <div className="text-start">
         <div className="mb-6">
           <h2 className="font-outfit font-bold text-[20px] text-text-primary-light dark:text-text-primary-dark">
             Account Information
@@ -339,7 +331,7 @@ function DesktopSectionContent({
               <Check size={14} /> Saved!
             </>
           ) : (
-            'Save Changes'
+            dict.preferences.saveChanges
           )}
         </button>
       </div>
@@ -347,10 +339,10 @@ function DesktopSectionContent({
 
   if (section === 'preferences')
     return (
-      <div>
+      <div className="text-start">
         <div className="mb-6">
           <h2 className="font-outfit font-bold text-[20px] text-text-primary-light dark:text-text-primary-dark">
-            Preferences
+            {dict.preferences.preferences}
           </h2>
           <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-1">
             Customize your app experience and notification settings.
@@ -359,14 +351,14 @@ function DesktopSectionContent({
         <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-gray-100 dark:border-white/[0.06] px-5">
           <DesktopToggleRow
             icon={isDark ? Moon : Sun}
-            label="Dark Mode"
+            label={dict.preferences.darkMode}
             desc="Switch between light and dark themes"
             value={isDark}
             onChange={(v) => setTheme(v ? 'dark' : 'light')}
           />
           <DesktopToggleRow
             icon={Bell}
-            label="Push Notifications"
+            label={dict.preferences.pushNotifications}
             desc="Receive price alerts and AI signals"
             value={notifEnabled}
             onChange={setNotifEnabled}
@@ -382,22 +374,25 @@ function DesktopSectionContent({
 
         <div className="mt-5">
           <h3 className="font-inter font-bold text-[13px] uppercase tracking-wider text-text-secondary-light dark:text-text-secondary-dark mb-3">
-            Language
+            {dict.preferences.language}
           </h3>
           <div className="grid grid-cols-2 gap-2">
-            {['English', 'العربية'].map((lang) => (
+            {[
+              { id: 'en', label: dict.preferences.english },
+              { id: 'ar', label: dict.preferences.arabic },
+            ].map((l) => (
               <button
-                key={lang}
-                onClick={() => setLanguage(lang)}
+                key={l.id}
+                onClick={() => setLanguage(l.id as any)}
                 className={cn(
                   'flex items-center justify-between px-4 py-3 rounded-xl border font-inter font-semibold text-[13px] transition-all',
-                  language === lang
+                  language === l.id
                     ? 'bg-primary/8 dark:bg-white/8 border-primary/20 dark:border-white/20 text-primary dark:text-white'
                     : 'bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/10 text-text-primary-light dark:text-text-primary-dark hover:bg-gray-50 dark:hover:bg-white/[0.06]'
                 )}
               >
-                {lang}
-                {language === lang && <Check size={14} />}
+                {l.label}
+                {language === l.id && <Check size={14} />}
               </button>
             ))}
           </div>
@@ -407,7 +402,7 @@ function DesktopSectionContent({
 
   if (section === 'security')
     return (
-      <div>
+      <div className="text-start">
         <div className="mb-6">
           <h2 className="font-outfit font-bold text-[20px] text-text-primary-light dark:text-text-primary-dark">
             Security
@@ -455,7 +450,7 @@ function DesktopSectionContent({
 
   if (section === 'subscription')
     return (
-      <div>
+      <div className="text-start">
         <div className="mb-6">
           <h2 className="font-outfit font-bold text-[20px] text-text-primary-light dark:text-text-primary-dark">
             Subscription
@@ -524,7 +519,7 @@ function DesktopSectionContent({
 
   if (section === 'about')
     return (
-      <div>
+      <div className="text-start">
         <div className="mb-6">
           <h2 className="font-outfit font-bold text-[20px] text-text-primary-light dark:text-text-primary-dark">
             About & Legal
@@ -555,7 +550,7 @@ function DesktopSectionContent({
             <button
               key={label}
               className={cn(
-                'w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors',
+                'w-full flex items-center gap-4 px-5 py-4 text-start hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors',
                 i < arr.length - 1 &&
                   'border-b border-gray-100 dark:border-white/[0.05]'
               )}
@@ -566,7 +561,7 @@ function DesktopSectionContent({
                   className="text-text-secondary-light dark:text-text-secondary-dark"
                 />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 text-start">
                 <p className="font-inter font-semibold text-[13.5px] text-text-primary-light dark:text-text-primary-dark">
                   {label}
                 </p>
@@ -603,8 +598,7 @@ function DesktopProfileLayout({
   setTheme,
   notifEnabled,
   setNotifEnabled,
-  language,
-  setLanguage,
+  handleLogout,
 }: {
   name: string
   setName: (n: string) => void
@@ -612,27 +606,47 @@ function DesktopProfileLayout({
   setTheme: (t: string) => void
   notifEnabled: boolean
   setNotifEnabled: (v: boolean) => void
-  language: string
-  setLanguage: (l: string) => void
+  handleLogout: () => void
 }) {
   const [activeSection, setActiveSection] = useState<DesktopSection>('account')
   const [showEdit, setShowEdit] = useState(false)
+  const { dict, isRTL, language } = useLanguage()
+
+  const desktopNav: { id: DesktopSection; icon: typeof User; label: string }[] =
+    [
+      { id: 'account', icon: User, label: language === 'ar' ? 'الحساب' : 'Account' },
+      {
+        id: 'preferences',
+        icon: Settings,
+        label: dict.preferences.preferences,
+      },
+      { id: 'security', icon: Lock, label: language === 'ar' ? 'الأمان' : 'Security' },
+      { id: 'subscription', icon: Crown, label: language === 'ar' ? 'الاشتراك' : 'Subscription' },
+      { id: 'about', icon: HelpCircle, label: language === 'ar' ? 'حول التطبيق' : 'About & Legal' },
+    ]
 
   return (
     <div className="hidden lg:flex flex-col h-full market-pattern">
       {/* Desktop header */}
       <div className="px-8 pt-6 pb-4 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
-        <h1 className="font-outfit font-bold text-[24px] text-primary dark:text-white tracking-tight">
-          Account & Settings
+        <h1 className="font-outfit font-bold text-[24px] text-primary dark:text-white tracking-tight text-start">
+          {dict.preferences.title}
         </h1>
-        <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
+        <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5 text-start">
           Manage your profile, preferences, and security
         </p>
       </div>
 
       <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left nav */}
-        <div className="w-60 shrink-0 border-r border-gray-100 dark:border-white/[0.06] flex flex-col overflow-y-auto">
+        <div
+          className={cn(
+            'w-60 shrink-0 flex flex-col overflow-y-auto',
+            isRTL
+              ? 'border-l border-gray-100 dark:border-white/[0.06]'
+              : 'border-r border-gray-100 dark:border-white/[0.06]'
+          )}
+        >
           {/* Profile mini card */}
           <div className="p-4 border-b border-gray-100 dark:border-white/[0.05]">
             <div className="flex items-center gap-3">
@@ -641,7 +655,7 @@ function DesktopProfileLayout({
                   {getInitials(name)}
                 </span>
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 text-start">
                 <p className="font-inter font-bold text-[12.5px] text-text-primary-light dark:text-text-primary-dark truncate">
                   {name}
                 </p>
@@ -662,12 +676,12 @@ function DesktopProfileLayout({
 
           {/* Nav items */}
           <nav className="flex-1 p-2.5 space-y-0.5">
-            {DESKTOP_NAV.map(({ id, icon: Icon, label }) => (
+            {desktopNav.map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
                 onClick={() => setActiveSection(id)}
                 className={cn(
-                  'relative w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left font-inter font-medium text-[13px] transition-colors',
+                  'relative w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-start font-inter font-medium text-[13px] transition-colors',
                   activeSection === id
                     ? 'text-primary dark:text-white'
                     : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/[0.04] hover:text-text-primary-light dark:hover:text-text-primary-dark'
@@ -685,7 +699,10 @@ function DesktopProfileLayout({
                 {activeSection === id && (
                   <motion.div
                     layoutId="profile-nav-dot"
-                    className="ml-auto w-1.5 h-1.5 rounded-full bg-primary dark:bg-white relative z-10"
+                    className={cn(
+                      'w-1.5 h-1.5 rounded-full bg-primary dark:bg-white relative z-10',
+                      isRTL ? 'mr-auto' : 'ml-auto'
+                    )}
                     transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                   />
                 )}
@@ -695,9 +712,12 @@ function DesktopProfileLayout({
 
           {/* Logout */}
           <div className="p-2.5 border-t border-gray-100 dark:border-white/[0.05]">
-            <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-inter font-semibold text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-inter font-semibold text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+            >
               <LogOut size={15} />
-              Log out
+              {dict.sidebar.logout}
             </button>
           </div>
         </div>
@@ -721,8 +741,6 @@ function DesktopProfileLayout({
                   setTheme={setTheme}
                   notifEnabled={notifEnabled}
                   setNotifEnabled={setNotifEnabled}
-                  language={language}
-                  setLanguage={setLanguage}
                 />
               </motion.div>
             </AnimatePresence>
@@ -774,7 +792,7 @@ function MobileInfoTile({
           className="text-text-secondary-light dark:text-text-secondary-dark"
         />
       </div>
-      <span className="font-inter font-medium text-[13px] text-text-primary-light dark:text-text-primary-dark flex-1">
+      <span className="font-inter font-medium text-[13px] text-text-primary-light dark:text-text-primary-dark flex-1 text-start">
         {label}
       </span>
       <span
@@ -809,7 +827,7 @@ function MobileSwitchTile({
           className="text-primary dark:text-text-secondary-dark"
         />
       </div>
-      <span className="font-inter font-medium text-[13px] text-text-primary-light dark:text-text-primary-dark flex-1">
+      <span className="font-inter font-medium text-[13px] text-text-primary-light dark:text-text-primary-dark flex-1 text-start">
         {label}
       </span>
       <Toggle value={value} onChange={onChange} />
@@ -826,10 +844,11 @@ function MobileNavTile({
   label: string
   onTap?: () => void
 }) {
+  const { isRTL } = useLanguage()
   return (
     <button
       onClick={onTap}
-      className="w-full flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 dark:border-white/[0.03] last:border-0 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors text-left"
+      className="w-full flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 dark:border-white/[0.03] last:border-0 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors text-start"
     >
       <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center shrink-0">
         <Icon
@@ -837,12 +856,15 @@ function MobileNavTile({
           className="text-text-secondary-light dark:text-text-secondary-dark"
         />
       </div>
-      <span className="font-inter font-medium text-[13px] text-text-primary-light dark:text-text-primary-dark flex-1">
+      <span className="font-inter font-medium text-[13px] text-text-primary-light dark:text-text-primary-dark flex-1 text-start">
         {label}
       </span>
       <ChevronRight
         size={14}
-        className="text-text-secondary-light/40 dark:text-text-secondary-dark/40"
+        className={cn(
+          'text-text-secondary-light/40 dark:text-text-secondary-dark/40',
+          isRTL && 'rotate-180'
+        )}
       />
     </button>
   )
@@ -855,8 +877,7 @@ function MobileProfileLayout({
   setTheme,
   notifEnabled,
   setNotifEnabled,
-  language,
-  setLanguage,
+  handleLogout,
 }: {
   name: string
   setName: (n: string) => void
@@ -864,11 +885,11 @@ function MobileProfileLayout({
   setTheme: (t: string) => void
   notifEnabled: boolean
   setNotifEnabled: (v: boolean) => void
-  language: string
-  setLanguage: (l: string) => void
+  handleLogout: () => void
 }) {
   const { setMobileOpen } = useSidebar()
   const [showEdit, setShowEdit] = useState(false)
+  const { dict, language, setLanguage, isRTL } = useLanguage()
 
   return (
     <div className="lg:hidden flex flex-col h-full market-pattern">
@@ -876,12 +897,15 @@ function MobileProfileLayout({
       <div className="flex items-center justify-center h-[56px] relative border-b border-gray-100 dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm shrink-0 px-4">
         <button
           onClick={() => setMobileOpen(true)}
-          className="absolute left-4 w-10 h-10 flex items-center justify-center text-primary dark:text-white"
+          className={cn(
+            'absolute w-10 h-10 flex items-center justify-center text-primary dark:text-white',
+            isRTL ? 'right-4' : 'left-4'
+          )}
         >
           <Menu size={20} />
         </button>
         <span className="font-outfit font-bold text-[18px] text-primary dark:text-white tracking-wide">
-          Profile
+          {dict.sidebar.profile}
         </span>
       </div>
 
@@ -915,7 +939,7 @@ function MobileProfileLayout({
 
           {/* Account section */}
           <div>
-            <p className="font-inter font-bold text-[10px] tracking-[1.2px] uppercase text-text-secondary-light/55 dark:text-text-secondary-dark/55 mb-2 px-1">
+            <p className="font-inter font-bold text-[10px] tracking-[1.2px] uppercase text-text-secondary-light/55 dark:text-text-secondary-dark/55 mb-2 px-1 text-start">
               Account
             </p>
             <MobileSettingsGroup>
@@ -939,26 +963,24 @@ function MobileProfileLayout({
 
           {/* Preferences section */}
           <div>
-            <p className="font-inter font-bold text-[10px] tracking-[1.2px] uppercase text-text-secondary-light/55 dark:text-text-secondary-dark/55 mb-2 px-1">
-              Preferences
+            <p className="font-inter font-bold text-[10px] tracking-[1.2px] uppercase text-text-secondary-light/55 dark:text-text-secondary-dark/55 mb-2 px-1 text-start">
+              {dict.preferences.preferences}
             </p>
             <MobileSettingsGroup>
               <MobileSwitchTile
                 icon={isDark ? Moon : Sun}
-                label="Dark Mode"
+                label={dict.preferences.darkMode}
                 value={isDark}
                 onChange={(v) => setTheme(v ? 'dark' : 'light')}
               />
               <MobileNavTile
                 icon={Globe}
-                label="Language"
-                onTap={() =>
-                  setLanguage(language === 'English' ? 'العربية' : 'English')
-                }
+                label={dict.preferences.language}
+                onTap={() => setLanguage(language === 'en' ? 'ar' : 'en')}
               />
               <MobileSwitchTile
                 icon={Bell}
-                label="Notifications"
+                label={dict.preferences.pushNotifications}
                 value={notifEnabled}
                 onChange={setNotifEnabled}
               />
@@ -967,7 +989,7 @@ function MobileProfileLayout({
 
           {/* About section */}
           <div>
-            <p className="font-inter font-bold text-[10px] tracking-[1.2px] uppercase text-text-secondary-light/55 dark:text-text-secondary-dark/55 mb-2 px-1">
+            <p className="font-inter font-bold text-[10px] tracking-[1.2px] uppercase text-text-secondary-light/55 dark:text-text-secondary-dark/55 mb-2 px-1 text-start">
               About
             </p>
             <MobileSettingsGroup>
@@ -984,12 +1006,15 @@ function MobileProfileLayout({
 
           {/* Logout */}
           <MobileSettingsGroup>
-            <button className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3.5 text-start hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+            >
               <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
                 <LogOut size={15} className="text-red-500" />
               </div>
               <span className="font-inter font-semibold text-[13px] text-red-500">
-                Log out
+                {dict.sidebar.logout}
               </span>
             </button>
           </MobileSettingsGroup>
@@ -1017,15 +1042,21 @@ function MobileProfileLayout({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
   const [name, setName] = useState('Ahmed Abdelaty')
   const [notifEnabled, setNotifEnabled] = useState(true)
-  const [language, setLanguage] = useState('English')
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  const handleLogout = () => {
+    document.cookie =
+      'raven_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+    router.push('/')
+  }
 
   if (!mounted) return <div className="h-full market-pattern" />
 
@@ -1038,8 +1069,7 @@ export default function ProfilePage() {
     setTheme,
     notifEnabled,
     setNotifEnabled,
-    language,
-    setLanguage,
+    handleLogout,
   }
 
   return (

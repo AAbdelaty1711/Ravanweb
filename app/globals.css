@@ -29,12 +29,12 @@
   }
 
   .dark {
-    --color-primary: #FFFFFF;
+    --color-primary: #ffffff;
     --color-primary-hover: rgba(255, 255, 255, 0.85);
-    --color-bg: #0D0D0D;
+    --color-bg: #0d0d0d;
     --color-bg-muted: #141414;
     --color-bg-card: #121212;
-    --color-border: #1F1F1F;
+    --color-border: #1f1f1f;
     --color-border-subtle: #181820;
     --color-border-strong: rgba(255, 255, 255, 0.1);
     --color-text-primary: #f0f2f8;
@@ -53,6 +53,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Match body so mobile overscroll never exposes a different colour */
+    background-color: var(--color-bg);
   }
 
   body {
@@ -96,7 +98,7 @@
   }
 
   .dark .market-pattern {
-    background-color: #0D0D0D;
+    background-color: #0d0d0d;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- Grid Dots --%3E%3Ccircle cx='10' cy='10' r='0.5' fill='%23ffffff' fill-opacity='0.015'/%3E%3Ccircle cx='110' cy='110' r='0.5' fill='%23ffffff' fill-opacity='0.015'/%3E%3Ccircle cx='210' cy='210' r='0.5' fill='%23ffffff' fill-opacity='0.015'/%3E%3C!-- Interweaving Flow Lines --%3E%3Cpath d='M0,220 Q100,180 200,220 T400,180' stroke='%23ffffff' stroke-width='0.8' stroke-opacity='0.03'/%3E%3Cpath d='M0,100 Q150,150 300,80 T500,120' stroke='%23ffffff' stroke-width='0.6' stroke-opacity='0.02'/%3E%3Cpath d='M50,300 Q150,200 250,280 T450,220' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.015'/%3E%3C!-- Technical Markers --%3E%3Cpath d='M30,50 l10,10 M40,50 l-10,10' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.04'/%3E%3Cpath d='M350,250 l8,0 M354,-4 v8' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.04' transform='translate(0,254)'/%3E%3C!-- Data Nodes --%3E%3Ccircle cx='40' cy='210' r='2' fill='%23ffffff' fill-opacity='0.04'/%3E%3Ccircle cx='180' cy='215' r='1.2' fill='%23ffffff' fill-opacity='0.03'/%3E%3Ccircle cx='320' cy='170' r='2.5' fill='%23ffffff' fill-opacity='0.035'/%3E%3Ccircle cx='120' cy='80' r='1.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3Ccircle cx='280' cy='110' r='2' fill='%23ffffff' fill-opacity='0.04'/%3E%3Ccircle cx='150' cy='150' r='1' fill='%23ffffff' fill-opacity='0.02'/%3E%3Ccircle cx='380' cy='40' r='1.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3C!-- Tiny Bar Spark --%3E%3Crect x='220' y='240' width='3' height='10' rx='0.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3Crect x='225' y='235' width='3' height='15' rx='0.5' fill='%23ffffff' fill-opacity='0.04'/%3E%3Crect x='230' y='242' width='3' height='8' rx='0.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3C/g%3E%3C/svg%3E");
     background-size: 400px 300px;
   }
@@ -179,3 +181,133 @@
 .drawer-overlay {
   @apply fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 lg:hidden;
 }
+
+/* ─── Global Scroll Lock Fix ────────────────────────────────────────── */
+/* Prevent Landing Page scroll height leak into Auth and Dashboard pages */
+html:has(.auth-layout-wrapper),
+body:has(.auth-layout-wrapper) {
+  overflow: hidden !important;
+}
+
+/* ─── Overscroll / Rubber-band Black Void Fix ────────────────────────── */
+/*
+ * When the mobile browser rubber-bands (bounce scroll), it paints the
+ * <html> element's background behind the page — not <body>.  CSS classes
+ * on body alone don't help because <html> is a separate painting surface.
+ *
+ * Belt-and-suspenders CSS fallback (backs up the BodyClassManager inline
+ * styles which are the primary fix). Targets both <html> and <body> via
+ * :has() so even before JS hydrates the colours are correct.
+ */
+html:has(.auth-layout-wrapper),
+html:has(.dashboard-mobile-shell) {
+  background-color: #f4f6f9 !important;
+  overscroll-behavior-y: none !important;
+}
+
+body:has(.auth-layout-wrapper),
+body:has(.dashboard-mobile-shell) {
+  background-color: #f4f6f9 !important;
+  overscroll-behavior-y: none !important;
+}
+
+
+/* 2. Mobile Override (Allow bounded scrolling) */
+@media (max-width: 768px) {
+  html:has(.auth-layout-wrapper),
+  body:has(.auth-layout-wrapper) {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+  }
+
+  .auth-layout-wrapper {
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow-y: auto !important;
+    padding: 2rem 1rem !important;
+    justify-content: flex-start !important;
+  }
+
+  .auth-card {
+    margin: auto 0 !important;
+  }
+}
+
+/* ─── Dashboard Mobile Scroll Fix ────────────────────────────────────────── */
+/*
+ * Root problem: on mobile the dashboard uses TWO nested overflow-y-auto
+ * containers. The outer one (.dashboard-scroll-outer) wins the scroll race,
+ * scrolling the ENTIRE page (header + tabs + cards) together. When that
+ * happens, the header/tabs disappear upward while the card list inner
+ * container stays at y:0, making cards appear to "slide under" the tabs.
+ *
+ * Fix: below the lg breakpoint (1024px) lock the OUTER scroll container so
+ * it cannot scroll. All scrolling is then delegated to the inner
+ * `flex-1 overflow-y-auto min-h-0` card list, which is correctly bounded
+ * inside the flex-col h-full chain.
+ *
+ * No padding, no fixed positioning, no arbitrary pixel offsets.
+ */
+@media (max-width: 1023px) {
+  /* Give the shell an explicit dvh height so h-full children resolve correctly */
+  .dashboard-mobile-shell {
+    height: 100dvh !important;
+  }
+
+  /* Lock the outer scroll wrapper — inner card lists own all scrolling */
+  .dashboard-scroll-outer {
+    overflow: hidden !important;
+  }
+}
+
+/* ─── Per-layout body background overrides ────────────────────────────────── */
+/*
+ * Applied by BodyClassManager.tsx when Auth or Dashboard layouts mount.
+ * Ensures the <html> / <body> bounce/overscroll area (visible on mobile Safari
+ * and Chrome when the virtual keyboard opens) always shows the correct
+ * theme background — never a black void from the Landing page.
+ */
+html.body-bg-light,
+html.body-bg-light body {
+  background-color: #f4f6f9 !important;
+}
+html.body-bg-dark,
+html.body-bg-dark body {
+  background-color: #0d0d0d !important;
+}
+
+/* ─── Auth Layout: keyboard-safe centering (mobile only) ─────────────────── */
+/*
+ * Bug: strict `justify-content: center` clashes with the shrunken viewport
+ * when the mobile virtual keyboard opens — the card gets squished/clipped.
+ *
+ * Fix: switch to flex-start + overflow-y: auto on mobile so the card scrolls
+ * naturally. The card self-centers via margin: auto when space allows.
+ */
+@media (max-width: 768px) {
+  .auth-layout-wrapper {
+    align-items: flex-start     !important;
+    justify-content: flex-start !important;
+    overflow-y: auto            !important;
+    overflow-x: hidden          !important;
+    height: auto                !important;
+    min-height: 100dvh          !important;
+    padding: 2rem 1.25rem       !important;
+    box-sizing: border-box      !important;
+  }
+
+  /* Self-centering: card pushes to vertical center when space exists,
+     scrolls naturally when keyboard steals viewport height              */
+  .auth-layout-wrapper > main {
+    width: 100%             !important;
+    margin-top: auto        !important;
+    margin-bottom: auto     !important;
+    display: flex           !important;
+    flex-direction: column  !important;
+    align-items: center     !important;
+  }
+}
+
+

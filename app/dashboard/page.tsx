@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Send,
   ArrowUp,
   Sparkles,
   TrendingUp,
@@ -12,56 +11,18 @@ import {
   Menu,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import Image from 'next/image'
 import { RavenMark } from '@/components/ui/RavenMark'
 import { useSidebar } from '@/components/SidebarContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
   id: string
   text: string
   isUser: boolean
 }
 
-// ─── Quick-start prompt cards (replaces Flutter _EmptyState prompt chips) ─────
-const PROMPT_CARDS = [
-  {
-    icon: TrendingUp,
-    title: 'Analyze AAPL',
-    subtitle: 'Get AI insight on Apple',
-    prompt: 'Analyze AAPL momentum and targets',
-    color: 'from-[#636363]/10 to-[#636363]/5',
-    border: 'border-[#636363]/15',
-  },
-  {
-    icon: Zap,
-    title: 'NVDA Forecast',
-    subtitle: 'NVIDIA Q2 outlook',
-    prompt: 'What is the AI forecast for NVDA this quarter?',
-    color: 'from-[#76B900]/10 to-[#76B900]/5',
-    border: 'border-[#76B900]/15',
-  },
-  {
-    icon: BarChart2,
-    title: 'Market Summary',
-    subtitle: "Today's key movers",
-    prompt: 'Give me a market summary and key movers for today',
-    color: 'from-primary/10 to-primary/5 dark:from-white/10 dark:to-white/5',
-    border: 'border-primary/12 dark:border-white/12',
-  },
-  {
-    icon: Sparkles,
-    title: 'Top AI Signals',
-    subtitle: 'Radar highlights',
-    prompt: 'What are the top AI Radar signals today?',
-    color: 'from-purple-500/10 to-purple-500/5',
-    border: 'border-purple-500/15',
-  },
-]
-
-// ─── Mock AI response generator ───────────────────────────────────────────────
 function generateAIResponse(query: string): string {
   const q = query.toLowerCase()
   if (q.includes('aapl') || q.includes('apple')) {
@@ -82,7 +43,6 @@ function generateAIResponse(query: string): string {
   return `### Analysis for "${query}"\n\nRaven AI is scanning momentum indicators, volume anomalies, and sentiment signals. \n\n**Key Takeaway:** Broader indices hold steady, but position sizing discipline is key. Use the \`/radar\` command for more specific signals.`
 }
 
-// ─── Thinking dots indicator ──────────────────────────────────────────────────
 function ThinkingDots() {
   return (
     <div className="flex items-center gap-1.5 py-3 px-4">
@@ -103,9 +63,6 @@ function ThinkingDots() {
   )
 }
 
-
-
-// ─── AI bubble (with Raven avatar) ───────────────────────────────────────────
 function AIBubble({ text }: { text: string }) {
   return (
     <motion.div
@@ -114,26 +71,18 @@ function AIBubble({ text }: { text: string }) {
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className="flex items-start gap-3 max-w-[85%]"
     >
-      {/* Avatar */}
-      <div
-        className="shrink-0 w-9 h-9 mt-0.5 rounded-full bg-primary/10 dark:bg-white/10
-                      flex items-center justify-center"
-      >
+      <div className="shrink-0 w-9 h-9 mt-0.5 rounded-full bg-primary/10 dark:bg-white/10 flex items-center justify-center">
         <RavenMark size={20} className="text-primary dark:text-white" />
       </div>
-
-      {/* Text with Markdown Rendering */}
       <div className="flex-1 pt-1 overflow-hidden">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
-            // Paragraphs: block-level but tightly controlled spacing
             p: ({ children }) => (
               <p className="font-inter text-[14px] text-text-primary-light dark:text-text-primary-dark leading-relaxed mb-3 last:mb-0 w-full">
                 {children}
               </p>
             ),
-            // Bold: branded primary color
             strong: ({ children }) => (
               <strong className="font-bold text-primary dark:text-white">
                 {children}
@@ -144,7 +93,6 @@ function AIBubble({ text }: { text: string }) {
                 {children}
               </em>
             ),
-            // Inline code: ALWAYS a span-like inline element, never block
             code: ({ children, ...props }: any) => (
               <span
                 className="inline px-1.5 py-0.5 rounded-md bg-black/10 dark:bg-white/10 font-mono text-[13px] text-primary dark:text-white"
@@ -153,19 +101,18 @@ function AIBubble({ text }: { text: string }) {
                 {children}
               </span>
             ),
-            // Block code: pre wraps everything, code inside is unstyled
             pre: ({ children }) => (
               <pre className="my-3 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.05] border border-black/5 dark:border-white/5 overflow-x-auto font-mono text-[13px] text-text-primary-light dark:text-text-primary-dark shadow-sm">
                 {children}
               </pre>
             ),
             ul: ({ children }) => (
-              <ul className="mb-3 pl-4 space-y-1 list-disc list-outside text-text-primary-light dark:text-text-primary-dark">
+              <ul className="mb-3 ps-4 space-y-1 list-disc list-outside text-text-primary-light dark:text-text-primary-dark">
                 {children}
               </ul>
             ),
             ol: ({ children }) => (
-              <ol className="mb-3 pl-4 space-y-1 list-decimal list-outside text-text-primary-light dark:text-text-primary-dark">
+              <ol className="mb-3 ps-4 space-y-1 list-decimal list-outside text-text-primary-light dark:text-text-primary-dark">
                 {children}
               </ol>
             ),
@@ -200,13 +147,13 @@ function AIBubble({ text }: { text: string }) {
               </a>
             ),
             blockquote: ({ children }) => (
-              <blockquote className="border-l-2 border-primary/30 dark:border-white/20 pl-3 py-0.5 my-3 text-text-secondary-light dark:text-text-secondary-dark">
+              <blockquote className="border-s-2 border-primary/30 dark:border-white/20 ps-3 py-0.5 my-3 text-text-secondary-light dark:text-text-secondary-dark">
                 {children}
               </blockquote>
             ),
             table: ({ children }) => (
               <div className="my-3 overflow-x-auto rounded-xl border border-black/5 dark:border-white/5">
-                <table className="w-full text-left text-[13px] border-collapse">
+                <table className="w-full text-start text-[13px] border-collapse">
                   {children}
                 </table>
               </div>
@@ -217,7 +164,7 @@ function AIBubble({ text }: { text: string }) {
               </thead>
             ),
             th: ({ children }) => (
-              <th className="px-4 py-2 border-b border-black/5 dark:border-white/5 text-text-primary-light dark:text-text-primary-dark">
+              <th className="px-4 py-2 border-b border-black/5 dark:border-white/5 text-text-primary-light dark:text-text-primary-dark text-start">
                 {children}
               </th>
             ),
@@ -238,7 +185,6 @@ function AIBubble({ text }: { text: string }) {
   )
 }
 
-// ─── User bubble ─────────────────────────────────────────────────────────────
 function UserBubble({ text }: { text: string }) {
   return (
     <motion.div
@@ -261,12 +207,12 @@ function UserBubble({ text }: { text: string }) {
   )
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
 function EmptyState({
   onPromptClick,
 }: {
   onPromptClick: (prompt: string) => void
 }) {
+  const { dict } = useLanguage()
   return (
     <motion.div
       key="empty"
@@ -275,7 +221,6 @@ function EmptyState({
       exit={{ opacity: 0 }}
       className="flex flex-col items-center justify-center h-full px-4 pb-8"
     >
-      {/* Raven logo with Pulse */}
       <div className="relative mb-8 flex items-center justify-center">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -291,26 +236,23 @@ function EmptyState({
           </motion.div>
         </motion.div>
       </div>
-
-      {/* Greeting */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
         className="text-center"
       >
-        <h2 className="font-outfit font-bold text-[20px] text-primary dark:text-white mb-2 leading-snug">
-          Raven AI is watching the markets.
+        <h2 className="font-outfit font-bold text-[17px] sm:text-[20px] whitespace-nowrap text-primary dark:text-white mb-2 leading-snug">
+          {dict.chat.greeting}
         </h2>
         <p className="font-inter text-[14px] text-text-secondary-light dark:text-text-secondary-dark">
-          What's our target?
+          {dict.chat.greetingDesc}
         </p>
       </motion.div>
     </motion.div>
   )
 }
 
-// ─── Chat Input ───────────────────────────────────────────────────────────────
 function ChatInput({
   value,
   onChange,
@@ -322,10 +264,10 @@ function ChatInput({
   onSend: () => void
   disabled: boolean
 }) {
+  const { dict, isRTL } = useLanguage()
   const ref = useRef<HTMLTextAreaElement>(null)
   const hasText = value.trim().length > 0
 
-  // Auto-resize textarea
   useEffect(() => {
     if (ref.current) {
       ref.current.style.height = 'auto'
@@ -341,7 +283,8 @@ function ChatInput({
           'bg-black/[0.04] dark:bg-white/[0.05]',
           'rounded-[30px] border border-transparent',
           'transition-all duration-200',
-          'focus-within:border-primary/20 dark:focus-within:border-white/15'
+          'focus-within:border-primary/20 dark:focus-within:border-white/15',
+          isRTL && 'flex-row-reverse'
         )}
       >
         <textarea
@@ -354,17 +297,17 @@ function ChatInput({
               if (hasText && !disabled) onSend()
             }
           }}
-          placeholder="Ask Raven AI for market insights..."
+          placeholder={dict.chat.placeholder}
           rows={1}
+          dir="auto"
           className={cn(
             'flex-1 resize-none bg-transparent outline-none',
             'font-inter text-[13px] text-text-primary-light dark:text-text-primary-dark',
             'placeholder:text-text-secondary-light/60 dark:placeholder:text-text-secondary-dark/60',
-            'py-1 leading-relaxed min-h-[24px] max-h-[120px]'
+            'py-1 leading-relaxed min-h-[24px] max-h-[120px]',
+            isRTL ? 'text-end' : 'text-start'
           )}
         />
-
-        {/* Send button */}
         <AnimatePresence>
           {hasText && (
             <motion.button
@@ -376,8 +319,7 @@ function ChatInput({
               disabled={disabled}
               className={cn(
                 'shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
-                'bg-primary dark:bg-white',
-                'text-white dark:text-black',
+                'bg-primary dark:bg-white text-white dark:text-black',
                 'transition-opacity',
                 disabled && 'opacity-50'
               )}
@@ -388,15 +330,15 @@ function ChatInput({
         </AnimatePresence>
       </div>
       <p className="text-center font-inter text-[10px] text-text-secondary-light/40 dark:text-text-secondary-dark/40 mt-2">
-        Raven AI · For informational purposes only
+        {dict.chat.disclaimer}
       </p>
     </div>
   )
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ChatPage() {
   const { setMobileOpen } = useSidebar()
+  const { dict, isRTL } = useLanguage()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [thinking, setThinking] = useState(false)
@@ -412,18 +354,11 @@ export default function ChatPage() {
     (preset?: string) => {
       const text = (preset ?? input).trim()
       if (!text || thinking) return
-
-      const userMsg: Message = {
-        id: Date.now().toString(),
-        text,
-        isUser: true,
-      }
+      const userMsg: Message = { id: Date.now().toString(), text, isUser: true }
       setMessages((prev) => [...prev, userMsg])
       setInput('')
       setThinking(true)
       scrollToBottom()
-
-      // Simulate AI response (mock)
       setTimeout(
         () => {
           const aiMsg: Message = {
@@ -443,14 +378,19 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-full market-pattern">
-      {/* ── Mobile header (visible on small screens, hidden on desktop) ── */}
+      {/* Mobile header */}
       <div
-        className="flex items-center justify-center h-14 border-b border-border-light dark:border-[#141414]
-                      bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md lg:hidden px-4 shrink-0 relative"
+        className={cn(
+          'flex items-center justify-center h-14 border-b border-border-light dark:border-[#141414]',
+          'bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md lg:hidden px-4 shrink-0 relative'
+        )}
       >
         <button
           onClick={() => setMobileOpen(true)}
-          className="absolute left-4 w-10 h-10 flex items-center justify-center text-primary dark:text-white"
+          className={cn(
+            'absolute w-10 h-10 flex items-center justify-center text-primary dark:text-white',
+            isRTL ? 'right-4' : 'left-4'
+          )}
         >
           <Menu size={20} />
         </button>
@@ -462,31 +402,35 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* ── Desktop header ────────────────────────────────────────────── */}
+      {/* Desktop header */}
       <div
-        className="hidden lg:flex items-center justify-between px-6 py-4 border-b
-                      border-border-light dark:border-[#141414] shrink-0"
+        className={cn(
+          'hidden lg:flex items-center justify-between px-6 py-4 border-b border-border-light dark:border-[#141414] shrink-0',
+          isRTL && 'flex-row-reverse'
+        )}
       >
-        <div>
+        <div className={isRTL ? 'text-end' : 'text-start'}>
           <h1 className="font-outfit font-bold text-[20px] text-primary dark:text-white">
-            AI Chat
+            {dict.chat.title}
           </h1>
           <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
-            Real-time market intelligence
+            {dict.chat.subtitle}
           </p>
         </div>
         <div
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full
-                        bg-bull/10 border border-bull/20"
+          className={cn(
+            'flex items-center gap-2 px-3 py-1.5 rounded-full bg-bull/10 border border-bull/20',
+            isRTL && 'flex-row-reverse'
+          )}
         >
           <div className="w-1.5 h-1.5 rounded-full bg-bull animate-pulse" />
           <span className="font-inter font-semibold text-[11px] text-bull">
-            Markets Open
+            {dict.chat.marketsOpen}
           </span>
         </div>
       </div>
 
-      {/* ── Message area ─────────────────────────────────────────────── */}
+      {/* Message area */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-0">
         <AnimatePresence mode="wait">
           {messages.length === 0 && !thinking ? (
@@ -505,18 +449,13 @@ export default function ChatPage() {
                   <AIBubble key={msg.id} text={msg.text} />
                 )
               )}
-
-              {/* Thinking indicator */}
               {thinking && (
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex items-center gap-3"
                 >
-                  <div
-                    className="shrink-0 w-9 h-9 rounded-full bg-primary/10 dark:bg-white/10
-                                  flex items-center justify-center"
-                  >
+                  <div className="shrink-0 w-9 h-9 rounded-full bg-primary/10 dark:bg-white/10 flex items-center justify-center">
                     <RavenMark
                       size={20}
                       className="text-primary dark:text-white"
@@ -525,14 +464,13 @@ export default function ChatPage() {
                   <ThinkingDots />
                 </motion.div>
               )}
-
               <div ref={bottomRef} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* ── Chat input ────────────────────────────────────────────────── */}
+      {/* Chat input */}
       <div className="shrink-0 pt-2">
         <ChatInput
           value={input}

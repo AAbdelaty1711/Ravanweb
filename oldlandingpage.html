@@ -1,0 +1,2762 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Raven AI — Financial Market Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --black: #0d0d0d;
+        --navy: #0b1f3a;
+        --green: #4ade80;
+        --red: #f87171;
+        --white: #f8f9fa;
+        --gray: #6b7280;
+        --gray-light: #9ca3af;
+        --glass-bg: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.08);
+      }
+
+      html {
+        scroll-behavior: auto;
+      }
+
+      html,
+      body {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+      }
+
+      html::-webkit-scrollbar,
+      body::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+      }
+
+      body {
+        background: var(--black);
+        color: var(--white);
+        font-family: 'Inter', sans-serif;
+        height: 600vh;
+        overflow-x: hidden;
+      }
+
+      /* Sticky Canvas */
+      #stage {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* Noise texture overlay */
+      #stage::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 100;
+        opacity: 0.5;
+      }
+
+      /* BG Gradient */
+      #bg-gradient {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 80% at 50% -20%,
+          rgba(11, 31, 58, 0.8) 0%,
+          var(--black) 70%
+        );
+        transition: opacity 0.3s;
+      }
+
+      /* ===== PHASE 1: HERO — LOGO DRAW & DASHBOARD REVEAL ===== */
+      #phase1 {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+
+      /* ── Logo Draw Stage ── */
+      #logo-draw-stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 3;
+        will-change: transform, opacity;
+        pointer-events: none;
+      }
+
+      #raven-svg-wrap {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        transform: translateY(-5vh);
+      }
+
+      #raven-logo-svg {
+        width: clamp(380px, 60vw, 720px);
+        height: auto;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4))
+          drop-shadow(0 0 30px rgba(255, 255, 255, 0.15))
+          drop-shadow(0 0 50px rgba(255, 255, 255, 0.05));
+        will-change: transform, opacity;
+        transform-origin: center center;
+        display: block;
+      }
+      /* Ensure there is NO animation property on the path itself, as JS will control it */
+      #raven-logo-path {
+      }
+
+      #hero-logo {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: #ffffff;
+        -webkit-text-fill-color: #ffffff;
+        text-shadow:
+          0 0 20px rgba(255, 255, 255, 0.3),
+          0 0 40px rgba(255, 255, 255, 0.1);
+        text-transform: uppercase;
+        opacity: 1;
+        will-change: opacity, transform;
+      }
+
+      #hero-sub {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.35);
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        opacity: 1;
+        will-change: opacity, transform;
+      }
+
+      @keyframes fade-in-up {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── Premium Dashboard ── */
+      #premium-dashboard {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        will-change: opacity;
+      }
+
+      #dash-shell {
+        width: min(960px, 95vw);
+        height: min(580px, 80vh);
+        background: rgba(10, 14, 20, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 20px;
+        backdrop-filter: blur(32px);
+        -webkit-backdrop-filter: blur(32px);
+        box-shadow:
+          0 0 0 1px rgba(74, 222, 128, 0.08),
+          0 60px 120px rgba(0, 0, 0, 0.7),
+          inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        grid-template-rows: 1fr;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Subtle top green accent line */
+      #dash-shell::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(74, 222, 128, 0.5),
+          transparent
+        );
+        z-index: 1;
+      }
+
+      /* ── Sidebar ── */
+      #dash-sidebar {
+        grid-column: 1;
+        grid-row: 1;
+        background: rgba(255, 255, 255, 0.02);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 1.25rem 0.875rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        overflow: hidden;
+      }
+
+      /* Logo mark */
+      .dash-logo-mark {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #fff, var(--green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        padding: 0.25rem 0.5rem 1rem;
+        letter-spacing: 0.06em;
+        flex-shrink: 0;
+      }
+
+      /* New chat button */
+      .dash-new-chat-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        background: rgba(74, 222, 128, 0.07);
+        border: 1px solid rgba(74, 222, 128, 0.18);
+        color: var(--green);
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: default;
+        letter-spacing: 0.02em;
+        margin-bottom: 1rem;
+        flex-shrink: 0;
+        transition: background 0.2s;
+      }
+
+      .dash-new-chat-btn svg {
+        flex-shrink: 0;
+        opacity: 0.8;
+      }
+
+      /* Nav items */
+      .dash-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.7rem 0.9rem;
+        border-radius: 8px;
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.35);
+        font-weight: 500;
+        cursor: default;
+        margin-bottom: 0.1rem;
+        flex-shrink: 0;
+      }
+
+      .dash-nav-item svg {
+        flex-shrink: 0;
+        opacity: 0.5;
+      }
+
+      .dash-nav-item.active {
+        background: rgba(74, 222, 128, 0.08);
+        color: var(--green);
+        border: 1px solid rgba(74, 222, 128, 0.15);
+      }
+
+      .dash-nav-item.active svg {
+        opacity: 1;
+      }
+
+      .dash-nav-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+      }
+
+      /* History section */
+      .dash-history-label {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.58rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 0.75rem 0.3rem;
+        flex-shrink: 0;
+      }
+
+      .dash-history-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.42rem 0.75rem;
+        border-radius: 7px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.3);
+        font-weight: 400;
+        cursor: default;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-shrink: 0;
+      }
+
+      .dash-history-item svg {
+        flex-shrink: 0;
+        opacity: 0.35;
+      }
+
+      .dash-history-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* History divider */
+      .dash-history-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.04);
+        margin: 0.6rem 0.5rem;
+        flex-shrink: 0;
+      }
+
+      /* Profile section at bottom */
+      .dash-profile {
+        margin-top: auto;
+        padding: 0.75rem 0.75rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        flex-shrink: 0;
+      }
+
+      .dash-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          rgba(74, 222, 128, 0.3),
+          rgba(11, 31, 58, 0.8)
+        );
+        border: 1px solid rgba(74, 222, 128, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--green);
+        flex-shrink: 0;
+      }
+
+      .dash-profile-text {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .dash-profile-name {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.7);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .dash-profile-plan {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.6rem;
+        color: rgba(255, 255, 255, 0.25);
+        margin-top: 0.05rem;
+      }
+
+      /* ── Main Chat Area ── */
+      #dash-chat-main {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Chat header */
+      #dash-chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        height: 56px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        flex-shrink: 0;
+      }
+
+      .dash-chat-header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+
+      .dash-chat-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+        letter-spacing: 0.01em;
+      }
+
+      .dash-chat-subtitle {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.3);
+        font-weight: 400;
+      }
+
+      .dash-markets-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 100px;
+        background: rgba(74, 222, 128, 0.06);
+        border: 1px solid rgba(74, 222, 128, 0.18);
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--green);
+        letter-spacing: 0.05em;
+      }
+
+      /* Chat center content */
+      #dash-chat-center {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        position: relative;
+      }
+
+      /* The center raven SVG — this is the morphing target */
+      #target-logo-svg {
+        width: 160px;
+        height: auto;
+        opacity: 0; /* hidden until morph handoff */
+        display: block;
+        filter: drop-shadow(0 0 18px rgba(74, 222, 128, 0.55))
+          drop-shadow(0 0 40px rgba(74, 222, 128, 0.22));
+        flex-shrink: 0;
+      }
+
+      .dash-chat-tagline {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(1rem, 1.8vw, 1.25rem);
+        font-weight: 700;
+        color: #ffffff;
+        text-align: center;
+        letter-spacing: -0.01em;
+      }
+
+      .dash-chat-subtagline {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.3);
+        text-align: center;
+        margin-top: -0.5rem;
+        font-weight: 400;
+      }
+
+      /* Suggested prompts row */
+      .dash-chat-prompts {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 0.5rem;
+      }
+
+      .dash-prompt-chip {
+        padding: 0.35rem 0.85rem;
+        border-radius: 100px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.35);
+        cursor: default;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+
+      .dash-prompt-chip:hover {
+        background: rgba(74, 222, 128, 0.05);
+        border-color: rgba(74, 222, 128, 0.15);
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Chat input bar */
+      #dash-chat-input-row {
+        padding: 0.875rem 1.25rem 1.1rem;
+        flex-shrink: 0;
+      }
+
+      .dash-chat-input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 0.65rem 0.75rem 0.65rem 1.1rem;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .dash-chat-input-wrap:focus-within {
+        border-color: rgba(74, 222, 128, 0.25);
+        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.05);
+      }
+
+      .dash-chat-input {
+        flex: 1;
+        background: none;
+        border: none;
+        outline: none;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.75);
+        caret-color: var(--green);
+      }
+
+      .dash-chat-input::placeholder {
+        color: rgba(255, 255, 255, 0.2);
+      }
+
+      .dash-chat-send-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: rgba(74, 222, 128, 0.12);
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: default;
+        flex-shrink: 0;
+        transition: background 0.2s;
+      }
+
+      .dash-chat-send-btn svg {
+        color: var(--green);
+      }
+
+      /* Live indicator pulse */
+      .live-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 8px var(--green);
+        animation: pulse-dot 1.5s ease-in-out infinite;
+        flex-shrink: 0;
+      }
+
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.7);
+        }
+      }
+
+      .up {
+        color: var(--green);
+      }
+      .dn {
+        color: var(--red);
+      }
+
+      /* Mobile: hide sidebar on very small screens */
+      @media (max-width: 640px) {
+        #dash-shell {
+          grid-template-columns: 1fr;
+          height: min(540px, 85vh);
+        }
+        #dash-sidebar {
+          display: none;
+        }
+        #dash-chat-main {
+          grid-column: 1;
+        }
+      }
+
+      /* ===== PHASE 2: CHAOS ===== */
+      #phase2 {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        opacity: 0;
+        pointer-events: none;
+        will-change: opacity;
+      }
+
+      #chaos-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      #scan-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--green),
+          rgba(74, 222, 128, 0.6),
+          var(--green),
+          transparent
+        );
+        box-shadow:
+          0 0 20px var(--green),
+          0 0 60px rgba(74, 222, 128, 0.4);
+        top: -10px;
+        will-change: top;
+        z-index: 10;
+      }
+
+      #scan-line::before {
+        content: '';
+        position: absolute;
+        inset: -30px 0;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          rgba(74, 222, 128, 0.03),
+          transparent
+        );
+      }
+
+      #phase2-text {
+        position: absolute;
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        opacity: 0;
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(1.4rem, 3vw, 2.2rem);
+        font-weight: 600;
+        color: white;
+        white-space: nowrap;
+        will-change: opacity, transform;
+        text-shadow: 0 0 40px rgba(74, 222, 128, 0.4);
+      }
+
+      /* Floating numbers */
+      .float-num {
+        position: absolute;
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--red);
+        opacity: 0;
+        pointer-events: none;
+        will-change: opacity;
+      }
+
+      /* ===== PHASE 3: CORE ===== */
+      #phase3 {
+        position: absolute;
+        inset: 0;
+        z-index: 6;
+        opacity: 0;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        will-change: opacity;
+      }
+
+      #core-card {
+        position: relative;
+        width: min(380px, 85vw);
+        padding: 2.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        box-shadow:
+          0 0 0 1px rgba(74, 222, 128, 0.1),
+          0 40px 80px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        text-align: center;
+      }
+
+      #core-card::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 25px;
+        background: linear-gradient(
+          135deg,
+          rgba(74, 222, 128, 0.2),
+          transparent 50%,
+          rgba(74, 222, 128, 0.05)
+        );
+        z-index: -1;
+      }
+
+      .core-label {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: 0.75rem;
+      }
+
+      .core-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: white;
+      }
+
+      #nodes-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .node {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        opacity: 0.2;
+        transition:
+          opacity 0.6s,
+          border-color 0.6s,
+          box-shadow 0.6s;
+        text-align: left;
+      }
+
+      .node.active {
+        opacity: 1;
+        border-color: rgba(74, 222, 128, 0.3);
+        box-shadow:
+          0 0 20px rgba(74, 222, 128, 0.08),
+          inset 0 0 20px rgba(74, 222, 128, 0.03);
+      }
+
+      .node-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--gray);
+        flex-shrink: 0;
+        transition:
+          background 0.6s,
+          box-shadow 0.6s;
+      }
+
+      .node.active .node-dot {
+        background: var(--green);
+        box-shadow: 0 0 12px var(--green);
+      }
+
+      .node-text {
+        flex: 1;
+      }
+      .node-name {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+      }
+      .node-desc {
+        font-size: 0.75rem;
+        color: var(--gray-light);
+        margin-top: 0.2rem;
+      }
+
+      .node-val {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--green);
+        transition: color 0.6s;
+      }
+
+      /* Core green line feed */
+      #feed-line {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 2px;
+        height: 0;
+        background: linear-gradient(to bottom, var(--green), transparent);
+        box-shadow: 0 0 10px var(--green);
+        transform: translateX(-50%);
+        will-change: height;
+      }
+
+      /* ===== PHASE 4: BENTO ===== */
+      #phase4 {
+        position: absolute;
+        inset: 0;
+        z-index: 7;
+        opacity: 0;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        will-change: opacity;
+      }
+
+      #bento-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 12px;
+        width: min(900px, 95vw);
+        height: min(500px, 65vh);
+        margin-bottom: 1.5rem;
+      }
+
+      .bento-cell {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 16px;
+        padding: 1.25rem;
+        backdrop-filter: blur(20px);
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.5s,
+          transform 0.5s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+        cursor: default;
+      }
+
+      .bento-cell:hover {
+        border-color: rgba(74, 222, 128, 0.2);
+        box-shadow: 0 0 30px rgba(74, 222, 128, 0.06);
+      }
+
+      .bento-cell.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .bento-cell::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(74, 222, 128, 0.04) 0%,
+          transparent 60%
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .bento-cell:hover::before {
+        opacity: 1;
+      }
+
+      .b1 {
+        grid-column: span 3;
+        grid-row: span 2;
+      }
+      .b2 {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+      .b3 {
+        grid-column: span 1;
+        grid-row: span 1;
+      }
+      .b4 {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+      .b5 {
+        grid-column: span 1;
+        grid-row: span 1;
+      }
+      .b6 {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+      .b7 {
+        grid-column: span 4;
+        grid-row: span 1;
+      }
+
+      .bento-tag {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: 0.5rem;
+        font-family: 'Outfit', sans-serif;
+      }
+
+      .bento-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+        font-weight: 700;
+        color: white;
+        line-height: 1.3;
+      }
+
+      .bento-val {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+        font-weight: 800;
+        color: var(--green);
+        letter-spacing: -0.03em;
+        margin-top: 0.5rem;
+      }
+
+      .bento-desc {
+        font-size: 0.75rem;
+        color: var(--gray-light);
+        margin-top: 0.5rem;
+        line-height: 1.5;
+      }
+
+      .bento-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+      }
+
+      .badge-green {
+        background: rgba(74, 222, 128, 0.1);
+        color: var(--green);
+      }
+      .badge-red {
+        background: rgba(248, 113, 113, 0.1);
+        color: var(--red);
+      }
+
+      /* Mini chart in b1 */
+      #mini-chart {
+        width: 100%;
+        height: 80px;
+        margin-top: 1rem;
+      }
+
+      /* Phone mockup */
+      #phone-section {
+        position: absolute;
+        inset: 0;
+        z-index: 8;
+        opacity: 0;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        will-change: opacity, transform;
+      }
+
+      #phone-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(1.5rem, 4vw, 2.8rem);
+        font-weight: 800;
+        text-align: center;
+        background: linear-gradient(135deg, #fff, rgba(74, 222, 128, 0.8));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      #phone-wrap {
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        gap: 3rem;
+        transform: translateY(60px);
+        will-change: transform;
+      }
+
+      #phone-mockup {
+        width: 220px;
+        height: 440px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1.5px solid rgba(255, 255, 255, 0.12);
+        border-radius: 36px;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+          0 0 0 6px rgba(255, 255, 255, 0.03),
+          0 60px 120px rgba(0, 0, 0, 0.8),
+          0 0 80px rgba(74, 222, 128, 0.08);
+        backdrop-filter: blur(20px);
+      }
+
+      #phone-mockup::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70px;
+        height: 28px;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 0 0 16px 16px;
+        z-index: 10;
+      }
+
+      .phone-screen {
+        position: absolute;
+        inset: 0;
+        padding: 2.5rem 1rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+
+      .phone-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+      }
+
+      .phone-logo {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 1rem;
+        background: linear-gradient(90deg, #fff, var(--green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .phone-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 0.75rem;
+      }
+
+      .phone-ticker {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: white;
+      }
+
+      .phone-price {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--green);
+      }
+
+      .phone-change {
+        font-size: 0.65rem;
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      .phone-mini-chart {
+        width: 100%;
+        height: 35px;
+        margin-top: 0.3rem;
+      }
+
+      #store-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .store-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1.25rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        min-width: 180px;
+      }
+
+      .store-btn:hover {
+        background: rgba(74, 222, 128, 0.08);
+        border-color: rgba(74, 222, 128, 0.3);
+        box-shadow: 0 0 20px rgba(74, 222, 128, 0.1);
+        transform: translateX(-4px);
+      }
+
+      .store-btn svg {
+        flex-shrink: 0;
+      }
+
+      .store-btn-text {
+        text-align: right;
+        flex: 1;
+      }
+      .store-sub {
+        font-size: 0.6rem;
+        color: var(--gray-light);
+      }
+      .store-name {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      /* QR Popup */
+      .qr-popup {
+        position: absolute;
+        right: 110%;
+        top: 50%;
+        transform: translateY(-50%) scale(0.8);
+        background: white;
+        border-radius: 12px;
+        padding: 0.75rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.25s;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+
+      .store-btn:hover .qr-popup {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+      }
+
+      .qr-inner {
+        width: 80px;
+        height: 80px;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+      }
+
+      /* Progress bar */
+      #scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--green),
+          rgba(74, 222, 128, 0.3)
+        );
+        z-index: 999;
+        width: 0%;
+        transition: width 0.1s;
+        box-shadow: 0 0 10px var(--green);
+      }
+
+      /* Nav */
+      #nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 500;
+        padding: 1.5rem 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        mix-blend-mode: normal;
+      }
+
+      #nav-logo {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 1.5rem;
+        background: linear-gradient(90deg, #fff 0%, var(--green) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.02em;
+      }
+
+      #nav-cta {
+        padding: 0.6rem 1.5rem;
+        border-radius: 100px;
+        background: rgba(74, 222, 128, 0.1);
+        border: 1px solid rgba(74, 222, 128, 0.3);
+        color: var(--green);
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        letter-spacing: 0.05em;
+      }
+
+      #nav-cta:hover {
+        background: var(--green);
+        color: var(--black);
+        box-shadow: 0 0 30px rgba(74, 222, 128, 0.3);
+      }
+
+
+
+      /* Particles */
+      #particles {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .particle {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        border-radius: 50%;
+        background: var(--green);
+        opacity: 0;
+        animation: float-particle linear infinite;
+      }
+
+      @keyframes float-particle {
+        0% {
+          transform: translateY(0) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.6;
+        }
+        90% {
+          opacity: 0.2;
+        }
+        100% {
+          transform: translateY(-100px) translateX(var(--dx, 20px));
+          opacity: 0;
+        }
+      }
+
+      /* Glow orbs */
+      .glow-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+      }
+
+      #orb1 {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(74, 222, 128, 0.06) 0%,
+          transparent 70%
+        );
+        top: -200px;
+        right: -100px;
+      }
+
+      #orb2 {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(11, 31, 58, 0.8) 0%,
+          transparent 70%
+        );
+        bottom: -150px;
+        left: -100px;
+      }
+      /* ===== PHONE CAROUSEL & UI ===== */
+      .phone-carousel {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        scroll-behavior: smooth;
+      }
+      .phone-carousel::-webkit-scrollbar { display: none; }
+      
+      .phone-slide {
+        min-width: 100%;
+        height: 100%;
+        scroll-snap-align: start;
+        padding: 2.5rem 1rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .phone-dots {
+        position: absolute;
+        bottom: 8px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        z-index: 20;
+      }
+      .p-dot {
+        width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: 0.3s;
+      }
+      .p-dot.active { background: var(--green); width: 12px; border-radius: 4px; }
+
+      /* Internal Phone UI Components */
+      .p-header-sm {
+        font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; padding-bottom: 0.3rem; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 0.2rem;
+      }
+      .p-header-sm span { color: var(--gray-light); font-weight: 400; }
+      
+      .p-list-item {
+        display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);
+      }
+      .p-sym { font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 700; color: white; }
+      .p-sub { font-size: 0.55rem; color: var(--gray-light); }
+      .p-val { font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 700; color: white; }
+      .p-val-sm { font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700; color: white; }
+      .p-badge { font-size: 0.5rem; padding: 0.1rem 0.3rem; border-radius: 4px; display: inline-block; margin-top:2px; font-weight: 600;}
+      .p-badge.up { background: rgba(74,222,128,0.15); color: var(--green); }
+      .p-badge.dn { background: rgba(248,113,113,0.15); color: var(--red); }
+
+      .p-radar-card {
+        padding: 0.6rem; background: rgba(255,255,255,0.02); border-radius: 10px; border-left: 2px solid var(--gray);
+      }
+      .p-radar-card.border-green { border-left-color: var(--green); }
+      .p-radar-card.border-red { border-left-color: var(--red); }
+      .p-r-top, .p-r-bot { display: flex; justify-content: space-between; align-items: center; }
+      .p-r-bot { margin-top: 0.4rem; }
+
+      .p-notif-card {
+        padding: 0.6rem; background: rgba(255,255,255,0.04); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);
+      }
+      .p-notif-head { display: flex; align-items: center; gap: 0.3rem; font-family: 'Outfit', sans-serif; font-size: 0.6rem; font-weight: 700; margin-bottom: 0.3rem;}
+      .p-badge-outline { font-size: 0.45rem; padding: 0.1rem 0.3rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); color: var(--gray-light); }
+      .p-badge-outline.green { border-color: rgba(74,222,128,0.3); color: var(--green); }
+      .p-time { margin-left: auto; font-size: 0.45rem; color: var(--gray-light); font-weight: 400;}
+      .p-notif-title { font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700; color: white; }
+      .p-notif-desc { font-size: 0.55rem; color: var(--gray-light); line-height: 1.3; margin-top: 2px; }
+
+      .p-chat-center { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+      .p-chat-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 0.5rem 0.8rem; font-size: 0.55rem; color: var(--gray-light); margin-top: auto; }
+    </style>
+  </head>
+  <body>
+    <!-- Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Nav -->
+    <nav id="nav">
+      <div id="nav-logo">RAVEN</div>
+      <button id="nav-cta">START</button>
+    </nav>
+
+
+
+    <!-- Main Stage (fixed) -->
+    <div id="stage">
+      <div class="glow-orb" id="orb1"></div>
+      <div class="glow-orb" id="orb2"></div>
+      <div id="bg-gradient"></div>
+      <div id="particles"></div>
+
+      <!-- PHASE 1: LOGO DRAW & DASHBOARD REVEAL -->
+      <div id="phase1">
+        <!-- Logo Draw Stage (center-screen, scales down & becomes chart line) -->
+        <div id="logo-draw-stage">
+          <div id="raven-svg-wrap">
+            <svg
+              id="raven-logo-svg"
+              viewBox="10 60 170 145"
+              preserveAspectRatio="xMidYMid meet"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <filter
+                  id="logo-glow"
+                  x="-60%"
+                  y="-60%"
+                  width="220%"
+                  height="220%"
+                >
+                  <feGaussianBlur stdDeviation="1.8" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <path
+                id="raven-logo-path"
+                d="m 42.398955,174.66625 c 2.364485,-9.40827 4.05641,-19.23246 8.6833,-27.85247 4.316587,-5.27252 6.839501,3.7835 8.219495,7.01558 0.553566,4.05645 6.028114,9.53741 8.114869,3.15487 4.332304,-10.57344 4.695368,-22.2921 8.865183,-32.89082 3.955844,-7.15208 7.824972,3.4296 8.275918,7.29428 1.902153,4.4944 2.176147,13.28502 8.427264,13.32501 5.207494,-2.56775 6.33981,-9.1688 9.936686,-13.34495 6.57229,-8.97556 18.32124,-10.77617 28.39272,-13.33863 10.71311,-2.50938 21.21921,-6.09771 30.88842,-11.3853 5.37305,-1.39598 -0.0618,9.28598 -2.04065,11.01856 -7.32968,1.4069 -7.74521,1.3585 -9.18108,2.82676 -2.66388,2.72398 2.48268,2.72883 1.69526,6.8397 -1.21186,6.3267 -13.32037,11.42602 -21.36004,13.70649 -4.08935,4.50372 8.48138,0.0278 7.27996,3.22828 -3.07615,4.30755 -8.84059,5.92604 -13.71423,7.51765 -6.07799,1.54704 -12.86078,2.87229 -17.3003,7.59875 3.39493,2.74642 7.75242,4.51598 11.71959,6.4777 6.7013,3.14816 13.74736,5.4524 20.66446,8.05018 1.00029,4.19558 -7.54694,3.52571 -10.7025,4.57364 -8.06642,0.7658 -17.72937,-0.57925 -22.8384,-7.5533 -2.23312,-3.38296 -2.20385,-8.65559 1.12722,-11.50227 -4.38416,-2.93957 -8.342303,-7.10778 -8.780221,-12.51186"
+                fill="none"
+                stroke="#FFFFFF"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                filter="url(#logo-glow)"
+              />
+            </svg>
+            <div id="hero-logo">Raven AI</div>
+            <div id="hero-sub">MARKET INTELLIGENCE · EVERY MOMENT</div>
+          </div>
+        </div>
+
+        <!-- Premium Glassmorphism Dashboard — AI Chat Layout -->
+        <div id="premium-dashboard">
+          <div id="dash-shell">
+            <!-- ── Sidebar ── -->
+            <div id="dash-sidebar">
+              <!-- Logo -->
+              <div class="dash-logo-mark" id="dash-logo-mark">RAVEN AI</div>
+
+              <!-- New Chat button -->
+              <button class="dash-new-chat-btn">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <line
+                    x1="6.5"
+                    y1="1"
+                    x2="6.5"
+                    y2="12"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    x1="1"
+                    y1="6.5"
+                    x2="12"
+                    y2="6.5"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                New Chat
+              </button>
+
+              <!-- Nav -->
+              <div class="dash-nav-item active">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M1 7C1 3.686 3.686 1 7 1s6 2.686 6 6-2.686 6-6 6S1 10.314 1 7z"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                  />
+                  <circle cx="7" cy="7" r="2" fill="currentColor" />
+                </svg>
+                AI Chat
+              </div>
+              <div class="dash-nav-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <rect
+                    x="1"
+                    y="3"
+                    width="12"
+                    height="9"
+                    rx="1.5"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                  />
+                  <path
+                    d="M4 3V2M10 3V2"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                    stroke-linecap="round"
+                  />
+                  <path d="M1 6h12" stroke="currentColor" stroke-width="1.3" />
+                </svg>
+                Watchlist
+              </div>
+              <div class="dash-nav-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M1 10L4.5 6l2.5 2.5L10 4l3 3"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                AI Radar
+              </div>
+              <div class="dash-nav-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M7 1.5a4 4 0 0 1 4 4v2.5l1.5 2H1.5L3 8V5.5a4 4 0 0 1 4-4z"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M5.5 11.5a1.5 1.5 0 0 0 3 0"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                  />
+                </svg>
+                Notifications
+              </div>
+
+              <!-- Profile -->
+              <div class="dash-profile">
+                <div class="dash-avatar">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <circle
+                      cx="7"
+                      cy="5"
+                      r="2.5"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                    />
+                    <path
+                      d="M1.5 12.5c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <div class="dash-profile-text">
+                  <div class="dash-profile-name">Trader Profile</div>
+                </div>
+              </div>
+            </div>
+            <!-- end sidebar -->
+
+            <!-- ── Main Chat Area ── -->
+            <div id="dash-chat-main">
+              <!-- Header -->
+              <div id="dash-chat-header">
+                <div class="dash-chat-header-left">
+                  <div class="dash-chat-title">AI Chat</div>
+                  <div class="dash-chat-subtitle">
+                    Real-time market intelligence
+                  </div>
+                </div>
+                <div class="dash-markets-badge">
+                  <span class="live-dot"></span>
+                  Markets Open
+                </div>
+              </div>
+
+              <!-- Center content — Raven logo + tagline -->
+              <div id="dash-chat-center">
+                <!-- TARGET SVG: exact replica of the hero logo. Starts invisible.
+                     The morph animation lands #raven-logo-svg here pixel-perfectly,
+                     then this fades in at 100% progress to complete the handoff. -->
+                <svg
+                  id="target-logo-svg"
+                  viewBox="10 60 170 145"
+                  preserveAspectRatio="xMidYMid meet"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <filter
+                      id="target-glow"
+                      x="-50%"
+                      y="-50%"
+                      width="200%"
+                      height="200%"
+                    >
+                      <feGaussianBlur stdDeviation="4" result="b" />
+                      <feMerge>
+                        <feMergeNode in="b" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  <path
+                    d="m 42.398955,174.66625 c 2.364485,-9.40827 4.05641,-19.23246 8.6833,-27.85247 4.316587,-5.27252 6.839501,3.7835 8.219495,7.01558 0.553566,4.05645 6.028114,9.53741 8.114869,3.15487 4.332304,-10.57344 4.695368,-22.2921 8.865183,-32.89082 3.955844,-7.15208 7.824972,3.4296 8.275918,7.29428 1.902153,4.4944 2.176147,13.28502 8.427264,13.32501 5.207494,-2.56775 6.33981,-9.1688 9.936686,-13.34495 6.57229,-8.97556 18.32124,-10.77617 28.39272,-13.33863 10.71311,-2.50938 21.21921,-6.09771 30.88842,-11.3853 5.37305,-1.39598 -0.0618,9.28598 -2.04065,11.01856 -7.32968,1.4069 -7.74521,1.3585 -9.18108,2.82676 -2.66388,2.72398 2.48268,2.72883 1.69526,6.8397 -1.21186,6.3267 -13.32037,11.42602 -21.36004,13.70649 -4.08935,4.50372 8.48138,0.0278 7.27996,3.22828 -3.07615,4.30755 -8.84059,5.92604 -13.71423,7.51765 -6.07799,1.54704 -12.86078,2.87229 -17.3003,7.59875 3.39493,2.74642 7.75242,4.51598 11.71959,6.4777 6.7013,3.14816 13.74736,5.4524 20.66446,8.05018 1.00029,4.19558 -7.54694,3.52571 -10.7025,4.57364 -8.06642,0.7658 -17.72937,-0.57925 -22.8384,-7.5533 -2.23312,-3.38296 -2.20385,-8.65559 1.12722,-11.50227 -4.38416,-2.93957 -8.342303,-7.10778 -8.780221,-12.51186"
+                    fill="none"
+                    stroke="#4ADE80"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    filter="url(#target-glow)"
+                  />
+                </svg>
+                <div class="dash-chat-tagline">
+                  Raven AI is watching the markets.
+                </div>
+                <div class="dash-chat-subtagline">What's our target?</div>
+              </div>
+
+              <!-- Input bar -->
+              <div id="dash-chat-input-row">
+                <div class="dash-chat-input-wrap">
+                  <input
+                    class="dash-chat-input"
+                    type="text"
+                    placeholder="Ask Raven AI for market insights..."
+                    readonly
+                  />
+                  <div class="dash-chat-send-btn">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                      <path
+                        d="M1 12L12 6.5 1 1v4.5l8 2-8 2V12z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end chat main -->
+          </div>
+          <!-- end dash-shell -->
+        </div>
+        <!-- end premium-dashboard -->
+      </div>
+      <!-- end phase1 -->
+
+      <!-- PHASE 2 -->
+      <div id="phase2">
+        <div id="scan-line"></div>
+        <svg
+          id="chaos-svg"
+          viewBox="0 0 1440 900"
+          preserveAspectRatio="xMidYMid slice"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <filter id="red-glow">
+              <feGaussianBlur stdDeviation="4" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="green-glow-strong">
+              <feGaussianBlur stdDeviation="6" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Chaos red lines - 20 jagged paths -->
+          <g id="chaos-lines" filter="url(#red-glow)"></g>
+          <!-- Clean gray lines (post-scan) -->
+          <g id="calm-lines"></g>
+          <!-- Green trend line -->
+          <path
+            id="green-trend"
+            d=""
+            stroke="#4ADE80"
+            stroke-width="3"
+            fill="none"
+            filter="url(#green-glow-strong)"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-dasharray="1800"
+            stroke-dashoffset="1800"
+          />
+        </svg>
+        <div id="phase2-text">From market noise, to clear opportunity</div>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div id="phase3">
+        <div id="feed-line"></div>
+        <div id="core-card">
+          <div class="core-label">● PROCESSING CORE ●</div>
+          <div class="core-title">Raven Intelligence Engine</div>
+          <svg width="100%" height="3" style="margin-bottom: 0.5rem">
+            <line
+              x1="0"
+              y1="1.5"
+              x2="100%"
+              y2="1.5"
+              stroke="url(#sep-grad)"
+              stroke-width="1"
+            />
+            <defs>
+              <linearGradient id="sep-grad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="transparent" />
+                <stop offset="50%" stop-color="rgba(74,222,128,0.4)" />
+                <stop offset="100%" stop-color="transparent" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div id="nodes-container">
+            <div class="node" id="node1">
+              <div class="node-dot"></div>
+              <div class="node-text">
+                <div class="node-name">Sentiment Analysis</div>
+                <div class="node-desc">AI News Feed Evaluation</div>
+              </div>
+              <div class="node-val">+87%</div>
+            </div>
+            <div class="node" id="node2">
+              <div class="node-dot"></div>
+              <div class="node-text">
+                <div class="node-name">Trade Momentum</div>
+                <div class="node-desc">High Probability Detection</div>
+              </div>
+              <div class="node-val">↑ 2.4x</div>
+            </div>
+            <div class="node" id="node3">
+              <div class="node-dot"></div>
+              <div class="node-text">
+                <div class="node-name">Risk Management</div>
+                <div class="node-desc">Capital Preservation Protocol</div>
+              </div>
+              <div class="node-val">⬡ A+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 4 -->
+      <div id="phase4">
+        <div id="bento-grid">
+          <!-- B1: Main chart card -->
+          <div class="bento-cell b1">
+            <div class="bento-tag">PORTFOLIO PERFORMANCE</div>
+            <div class="bento-title">Exceptional Returns Powered by AI</div>
+            <div class="bento-val">+34.8%</div>
+            <span class="bento-badge badge-green">↑ +12.3% this month</span>
+            <svg
+              id="mini-chart"
+              viewBox="0 0 300 80"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(74,222,128,0.3)" />
+                  <stop offset="100%" stop-color="rgba(74,222,128,0)" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0,70 L30,60 L60,55 L90,45 L120,40 L150,30 L180,25 L210,15 L240,18 L270,10 L300,5 L300,80 L0,80 Z"
+                fill="url(#chart-fill)"
+              />
+              <path
+                d="M0,70 L30,60 L60,55 L90,45 L120,40 L150,30 L180,25 L210,15 L240,18 L270,10 L300,5"
+                stroke="#4ADE80"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <!-- B2 -->
+          <div class="bento-cell b2">
+            <div class="bento-tag">SMART ALERTS</div>
+            <div class="bento-title">Real-time Signals at Peak Opportunity</div>
+            <div class="bento-val" style="font-size: 1.8rem">2,847</div>
+            <div class="bento-desc">alert sent today</div>
+          </div>
+          <!-- B3 -->
+          <div
+            class="bento-cell b3"
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              text-align: center;
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--green); display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"></path></svg>
+            </div>
+            <div class="bento-tag">SPEED</div>
+            <div class="bento-val" style="font-size: 1.6rem">12ms</div>
+            <div class="bento-desc" style="font-size: 0.65rem">
+              Response Time
+            </div>
+          </div>
+          <!-- B4 -->
+          <div class="bento-cell b4">
+            <div class="bento-tag">MARKET THREADS</div>
+            <div class="bento-title">Smarter tracking across 50+ markets</div>
+            <div
+              style="
+                display: flex;
+                gap: 0.4rem;
+                margin-top: 0.75rem;
+                flex-wrap: wrap;
+              "
+            >
+              <span class="bento-badge badge-green">AAPL +2.1%</span>
+              <span class="bento-badge badge-red">TSLA -1.3%</span>
+              <span class="bento-badge badge-green">NVDA +4.8%</span>
+            </div>
+          </div>
+          <!-- B5 -->
+          <div
+            class="bento-cell b5"
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              text-align: center;
+            "
+          >
+            <div style="font-size: 2.2rem; margin-bottom: 0.3rem; color: var(--green); display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M208,40H48A16,16,0,0,0,32,56v58.77c0,89.61,75.82,119.34,91,124.39a15.53,15.53,0,0,0,10,0c15.2-5.05,91-34.78,91-124.39V56A16,16,0,0,0,208,40Z"></path></svg>
+            </div>
+            <div class="bento-title" style="font-size: 0.85rem">
+              Capital Protection
+            </div>
+          </div>
+          <!-- B6 -->
+          <div class="bento-cell b6">
+            <div class="bento-tag">USER TRUST</div>
+            <div class="bento-val" style="font-size: 1.8rem">98.4%</div>
+            <div class="bento-desc">Customer Satisfaction</div>
+            <div style="display: flex; gap: 2px; margin-top: 0.5rem">
+              <span style="color: var(--green); font-size: 0.9rem">★★★★★</span>
+            </div>
+          </div>
+          <!-- B7 -->
+          <div
+            class="bento-cell b7"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <div>
+              <div class="bento-tag">START YOUR JOURNEY</div>
+              <div class="bento-title">Join over 50,000 smart traders</div>
+            </div>
+            <button
+              style="
+                padding: 0.7rem 1.5rem;
+                background: var(--green);
+                color: var(--black);
+                border: none;
+                border-radius: 100px;
+                font-family: 'Outfit', sans-serif;
+                font-weight: 700;
+                font-size: 0.9rem;
+                cursor: pointer;
+                white-space: nowrap;
+                flex-shrink: 0;
+              "
+            >
+              Start Now →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHONE SECTION -->
+      <div id="phone-section">
+        <div id="phone-title">Smart Trading in Your Pocket</div>
+        <div id="phone-wrap">
+          <div id="store-buttons">
+            <div class="store-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path
+                  d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+                />
+              </svg>
+              <div class="store-btn-text">
+                <div class="store-sub">Download on</div>
+                <div class="store-name">App Store</div>
+              </div>
+              <div class="qr-popup">
+                <div class="qr-inner" id="qr1"></div>
+              </div>
+            </div>
+            <div class="store-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path
+                  d="M3.18 23.76c.3.17.64.22.97.15l12.81-7.4-2.81-2.82-10.97 10.07zM.61 1.46C.23 1.83 0 2.43 0 3.22v17.56c0 .79.23 1.39.61 1.76l.09.09 9.83-9.83v-.23L.7 1.38l-.09.08zm20.44 9.35-2.63-1.52-3.12 3.12 3.12 3.12 2.65-1.52c.75-.44.75-1.16 0-1.6l-.02-.6zM3.18.24l12.81 7.4-2.81 2.82L3.18.24z"
+                />
+              </svg>
+              <div class="store-btn-text">
+                <div class="store-sub">Available on</div>
+                <div class="store-name">Google Play</div>
+              </div>
+              <div class="qr-popup">
+                <div class="qr-inner" id="qr2"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="phone-mockup">
+            <div class="phone-carousel" id="phone-carousel">
+              
+              <div class="phone-slide">
+                <div class="phone-header">
+                  <span class="phone-logo">RAVEN</span>
+                  <span style="font-size: 0.65rem; color: var(--green)">● LIVE</span>
+                </div>
+                <div class="phone-card target-b1">
+                  <div style="font-size: 0.5rem; color: var(--green); letter-spacing: 0.1em; margin-bottom: 2px;">PORTFOLIO PERFORMANCE</div>
+                  <div class="phone-price">+34.8%</div>
+                  <svg class="phone-mini-chart" viewBox="0 0 160 35" preserveAspectRatio="none">
+                    <path d="M0,30 L20,25 L40,22 L60,15 L80,12 L100,8 L120,10 L140,5 L160,3" stroke="#4ADE80" stroke-width="1.5" fill="none"/>
+                  </svg>
+                </div>
+                <div class="phone-card target-b2" style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-size: 0.5rem; color: var(--green); letter-spacing: 0.1em; margin-bottom: 2px;">SMART ALERTS</div>
+                    <div class="phone-price" style="font-size: 1.1rem;">2,847</div>
+                  </div>
+                  <div style="font-size: 1.2rem; color: var(--green); display: flex; align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"></path></svg>
+                  </div>
+                </div>
+                <div class="phone-card target-b4">
+                  <div style="font-size: 0.5rem; color: var(--green); letter-spacing: 0.1em; margin-bottom: 6px;">MARKET THREADS</div>
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                    <span class="bento-badge badge-green" style="font-size: 0.45rem; padding: 0.15rem 0.4rem; margin:0;">AAPL +2.1%</span>
+                    <span class="bento-badge badge-red" style="font-size: 0.45rem; padding: 0.15rem 0.4rem; margin:0;">TSLA -1.3%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="phone-slide">
+                <div class="p-chat-center">
+                  <div class="phone-logo" style="font-size:1.8rem; margin-bottom:0.5rem;">RAVEN AI</div>
+                  <div style="font-size: 0.8rem; font-weight: 600; text-align: center; color: white;">Raven AI is watching the markets.<br><span style="color:var(--gray-light); font-weight:400; font-size:0.7rem;">What's our target?</span></div>
+                </div>
+                <div class="p-chat-input">Ask Raven AI for insights...</div>
+              </div>
+
+              <div class="phone-slide">
+                <div class="p-header-sm"><span>&lt;</span> Watchlist</div>
+                <div class="p-list-item">
+                  <div class="p-col"><div class="p-sym">AAPL</div><div class="p-sub">Apple Inc.</div></div>
+                  <div class="p-col"><div class="p-val">$189.30</div><div class="p-badge up">+4.6%</div></div>
+                  <div class="p-col" style="text-align:right;"><div class="p-sub">T1 $198.00</div><div class="p-sub">T2 $210.50</div></div>
+                </div>
+                <div class="p-list-item">
+                  <div class="p-col"><div class="p-sym">NVDA</div><div class="p-sub">NVIDIA Corp</div></div>
+                  <div class="p-col"><div class="p-val">$875.20</div><div class="p-badge up">+5.1%</div></div>
+                  <div class="p-col" style="text-align:right;"><div class="p-sub">T1 $920.00</div><div class="p-sub">T2 $980.00</div></div>
+                </div>
+                <div class="p-list-item">
+                  <div class="p-col"><div class="p-sym">TSLA</div><div class="p-sub">Tesla Inc.</div></div>
+                  <div class="p-col"><div class="p-val" style="color:var(--red)">$248.50</div><div class="p-badge dn">-7.4%</div></div>
+                  <div class="p-col" style="text-align:right;"><div class="p-sub">T1 $230.00</div><div class="p-sub">T2 $215.00</div></div>
+                </div>
+              </div>
+
+              <div class="phone-slide">
+                <div class="p-header-sm"><span>&lt;</span> AI Radar</div>
+                <div class="p-radar-card border-green">
+                  <div class="p-r-top"><div class="p-sym">NVDA</div><div class="p-sub">2 hours ago</div></div>
+                  <div class="p-r-bot">
+                    <div><div class="p-sub">Entry</div><div class="p-val-sm">$850.50</div></div>
+                    <div style="text-align:right;"><div class="p-sub">Max Return</div><div class="p-val-sm up">+4.2%</div></div>
+                  </div>
+                </div>
+                <div class="p-radar-card border-red">
+                  <div class="p-r-top"><div class="p-sym">TSLA</div><div class="p-sub">1 day ago</div></div>
+                  <div class="p-r-bot">
+                    <div><div class="p-sub">Entry</div><div class="p-val-sm">$175.20</div></div>
+                    <div style="text-align:right;"><div class="p-sub">Max Return</div><div class="p-val-sm dn">-3.8%</div></div>
+                  </div>
+                </div>
+                <div class="p-radar-card border-gray">
+                  <div class="p-r-top"><div class="p-sym">COIN</div><div class="p-sub">5 hours ago</div></div>
+                  <div class="p-r-bot">
+                    <div><div class="p-sub">Entry</div><div class="p-val-sm">$210.00</div></div>
+                    <div style="text-align:right;"><div class="p-sub">Max Return</div><div class="p-val-sm up">+1.5%</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="phone-slide">
+                <div class="p-header-sm"><span>&lt;</span> Notifications</div>
+                <div class="p-notif-card">
+                  <div class="p-notif-head"><span class="p-badge-outline">AI Radar</span> NVDA <span class="p-time">2m ago</span></div>
+                  <div class="p-notif-title">AI Radar Signal</div>
+                  <div class="p-notif-desc">NVDA is showing a Golden Cross pattern with high volume surge.</div>
+                </div>
+                <div class="p-notif-card">
+                  <div class="p-notif-head"><span class="p-badge-outline green">Price Alert</span> AAPL <span class="p-time">18m ago</span></div>
+                  <div class="p-notif-title">Price Alert Triggered</div>
+                  <div class="p-notif-desc">AAPL has reached your target price of $198.00.</div>
+                </div>
+              </div>
+
+            </div>
+            
+            <div class="phone-dots" id="phone-dots">
+              <div class="p-dot active"></div>
+              <div class="p-dot"></div>
+              <div class="p-dot"></div>
+              <div class="p-dot"></div>
+              <div class="p-dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end stage -->
+
+    <script>
+      // ============================================================
+      // RAVEN AI — CINEMATIC SCROLL ENGINE (STORYTELLING EDITION)
+      // ============================================================
+
+      const lerp = (a, b, t) => a + (b - a) * t
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
+      const norm = (v, min, max) => clamp((v - min) / (max - min), 0, 1)
+      const easeInOut = (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t)
+      const easeOut = (t) => 1 - Math.pow(1 - t, 3)
+      const easeIn = (t) => t * t * t
+
+      // State
+      let scrollY = 0,
+        targetScrollY = 0
+      let scrollProgress = 0 // 0 to 1
+      let lerpedProgress = 0
+      let raf
+
+      // Elements
+      const stage = document.getElementById('stage')
+      const phase1 = document.getElementById('phase1')
+      const phase2 = document.getElementById('phase2')
+      const phase3 = document.getElementById('phase3')
+      const phase4 = document.getElementById('phase4')
+      const phoneSection = document.getElementById('phone-section')
+      const logoDrawStage = document.getElementById('logo-draw-stage')
+      const premiumDash = document.getElementById('premium-dashboard')
+
+      const scanLine = document.getElementById('scan-line')
+      const chaosSvg = document.getElementById('chaos-svg')
+      const chaosLines = document.getElementById('chaos-lines')
+      const calmLines = document.getElementById('calm-lines')
+      const greenTrend = document.getElementById('green-trend')
+      const p2text = document.getElementById('phase2-text')
+      const feedLine = document.getElementById('feed-line')
+      const node1 = document.getElementById('node1')
+      const node2 = document.getElementById('node2')
+      const node3 = document.getElementById('node3')
+      const bentoCells = document.querySelectorAll('.bento-cell')
+      const phoneWrap = document.getElementById('phone-wrap')
+      const progressBar = document.getElementById('scroll-progress')
+      const phaseDots = document.querySelectorAll('.phase-dot')
+      const orb1 = document.getElementById('orb1')
+
+      // ============================================================
+      // GENERATE CHAOS LINES
+      // ============================================================
+      const NUM_CHAOS = 28
+      const chaosData = []
+
+      function generateChaosLines() {
+        chaosLines.innerHTML = ''
+        calmLines.innerHTML = ''
+
+        for (let i = 0; i < NUM_CHAOS; i++) {
+          const y = 80 + (i / NUM_CHAOS) * 740
+          const amplitude = 30 + Math.random() * 60
+          const freq = 0.01 + Math.random() * 0.02
+          const phase = Math.random() * Math.PI * 2
+          const chaos = 15 + Math.random() * 25
+
+          let d = `M 0 ${y}`
+          for (let x = 0; x <= 1440; x += 20) {
+            const jitter = (Math.random() - 0.5) * chaos
+            const wave = Math.sin(x * freq + phase) * amplitude
+            d += ` L ${x} ${y + wave + jitter}`
+          }
+
+          const opacity = 0.3 + Math.random() * 0.5
+          const path = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'path'
+          )
+          path.setAttribute('d', d)
+          path.setAttribute('stroke', `rgba(248,113,113,${opacity})`)
+          path.setAttribute('stroke-width', 1 + Math.random() * 1.5)
+          path.setAttribute('fill', 'none')
+          path.setAttribute('stroke-linecap', 'round')
+
+          const len = path.getTotalLength ? path.getTotalLength() || 2000 : 2000
+          path.setAttribute('stroke-dasharray', len)
+          path.setAttribute('stroke-dashoffset', 0)
+
+          chaosLines.appendChild(path)
+
+          const flatD = `M 0 ${y} L 1440 ${y}`
+          const calmPath = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'path'
+          )
+          calmPath.setAttribute('d', flatD)
+          calmPath.setAttribute('stroke', 'rgba(107,114,128,0.2)')
+          calmPath.setAttribute('stroke-width', 0.8)
+          calmPath.setAttribute('fill', 'none')
+          calmPath.style.opacity = 0
+          calmLines.appendChild(calmPath)
+
+          chaosData.push({ path, calmPath, y, len })
+        }
+
+        greenTrend.setAttribute(
+          'd',
+          'M -50 800 C 200 700, 400 550, 600 420 C 800 300, 1000 200, 1440 80'
+        )
+      }
+
+      // ============================================================
+      // GENERATE QR CODES
+      // ============================================================
+      function generateQR(id) {
+        const el = document.getElementById(id)
+        if (!el) return
+        const pattern = []
+        for (let i = 0; i < 49; i++) pattern.push(Math.random() > 0.5)
+        ;[
+          0, 1, 2, 7, 8, 14, 6, 13, 20, 42, 43, 44, 49, 48, 47, 35, 36, 41,
+        ].forEach((i) => {
+          if (i < 49) pattern[i] = true
+        })
+        el.innerHTML = pattern
+          .map(
+            (v) =>
+              `<div style="width:100%;height:100%;background:${v ? '#000' : '#fff'};border-radius:1px;"></div>`
+          )
+          .join('')
+      }
+      generateQR('qr1')
+      generateQR('qr2')
+
+      // ============================================================
+      // PARTICLES & FLOATING NUMBERS
+      // ============================================================
+      function spawnParticles() {
+        const container = document.getElementById('particles')
+        for (let i = 0; i < 40; i++) {
+          const p = document.createElement('div')
+          p.className = 'particle'
+          p.style.left = Math.random() * 100 + '%'
+          p.style.top = 40 + Math.random() * 50 + '%'
+          p.style.setProperty('--dx', (Math.random() - 0.5) * 60 + 'px')
+          const dur = 4 + Math.random() * 8
+          p.style.animationDuration = dur + 's'
+          p.style.animationDelay = -Math.random() * dur + 's'
+          p.style.width = p.style.height = 1 + Math.random() * 2 + 'px'
+          p.style.opacity = 0.3 + Math.random() * 0.4
+          container.appendChild(p)
+        }
+      }
+
+      const floatNums = []
+      function spawnFloatNums() {
+        const tickers = [
+          '2847.3',
+          '-12.4%',
+          '0.0034',
+          'BUY',
+          'SELL',
+          'VOL 2.4M',
+          '+0.87',
+          '-3.2%',
+          '14.03',
+          'RSI 78',
+          'MACD',
+          '98.22',
+          '-0.91',
+          'OBV↑',
+          '4.2B',
+        ]
+        const container = document.getElementById('particles')
+        for (let i = 0; i < 35; i++) {
+          const el = document.createElement('div')
+          el.className = 'float-num'
+          el.textContent = tickers[i % tickers.length]
+          el.style.left = 2 + Math.random() * 96 + '%'
+          el.style.top = 5 + Math.random() * 90 + '%'
+          el.style.opacity = 0
+          el.style.color =
+            Math.random() > 0.5 ? 'var(--red)' : 'rgba(255,255,255,0.3)'
+          el.style.fontSize = 0.55 + Math.random() * 0.35 + 'rem'
+          container.appendChild(el)
+          floatNums.push(el)
+        }
+      }
+
+      // ============================================================
+      // PHONE CAROUSEL LOGIC (Auto-play + Dot Click + Touch Swipe)
+      // ============================================================
+      let phoneAutoScrollTimer;
+      function initPhoneCarousel() {
+          const carousel = document.getElementById('phone-carousel');
+          const dots = document.querySelectorAll('.p-dot');
+          if (!carousel) return;
+
+          function updateDots() {
+              if (carousel.offsetWidth === 0) return;
+              const index = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+              dots.forEach((d, i) => d.classList.toggle('active', i === index));
+          }
+
+          carousel.addEventListener('scroll', updateDots);
+
+          const startAutoPlay = () => {
+              clearInterval(phoneAutoScrollTimer);
+              phoneAutoScrollTimer = setInterval(() => {
+                  if (carousel.offsetWidth === 0) return;
+                  let currentIndex = Math.round(carousel.scrollLeft / carousel.offsetWidth);
+                  currentIndex = (currentIndex + 1) % dots.length; 
+                  carousel.scrollTo({ left: currentIndex * carousel.offsetWidth, behavior: 'smooth' });
+              }, 3000); // 3 seconds per slide
+          };
+          const stopAutoPlay = () => clearInterval(phoneAutoScrollTimer);
+
+          // Mobile Touch Events (Native smooth scrolling applies)
+          carousel.addEventListener('touchstart', stopAutoPlay, {passive: true});
+          carousel.addEventListener('touchend', startAutoPlay);
+
+          // Desktop Hover Events
+          carousel.addEventListener('mouseenter', stopAutoPlay);
+          carousel.addEventListener('mouseleave', startAutoPlay);
+
+          // Clickable Dots Navigation
+          dots.forEach((dot, index) => {
+              dot.addEventListener('click', () => {
+                  if (carousel.offsetWidth === 0) return;
+                  stopAutoPlay();
+                  carousel.scrollTo({ left: index * carousel.offsetWidth, behavior: 'smooth' });
+                  startAutoPlay();
+              });
+              // Make dots appear clickable
+              dot.style.cursor = 'pointer';
+          });
+
+          // Reset cursor for the carousel itself since dragging is removed
+          carousel.style.cursor = 'default';
+
+          startAutoPlay();
+      }
+
+      // ============================================================
+      // MAIN RENDER LOOP (The Magic Happens Here)
+      // ============================================================
+      function render() {
+        const maxScroll = document.body.scrollHeight - window.innerHeight
+        targetScrollY = window.scrollY
+        lerpedProgress = lerp(lerpedProgress, targetScrollY / maxScroll, 0.07)
+        const p = lerpedProgress 
+
+        // Progress bar
+        progressBar.style.width = p * 100 + '%'
+        // Orb parallax
+        orb1.style.transform = `translateY(${p * -80}px)`
+
+        // Update Phase dots logic (put this near the top of render function if needed, or just update the thresholds)
+        let currentPhase = 0
+        if (p < 0.28) currentPhase = 0
+        else if (p < 0.53) currentPhase = 1 // Chaos runs longer
+        else if (p < 0.72) currentPhase = 2 // Core starts later
+        else currentPhase = 3
+        phaseDots.forEach((d, i) => Math.abs(currentPhase - i) === 0 ? d.classList.add('active') : d.classList.remove('active'))
+
+        // ── PHASE 1: LOGO DRAW & DASHBOARD REVEAL ──
+        if (p < 0.40) {
+          phase1.style.opacity = 1
+          phase1.style.display = 'flex'
+        } else {
+          phase1.style.opacity = 0
+          phase1.style.display = 'none'
+        }
+
+        const drawP = clamp(p / 0.15, 0, 1)
+        const logoPath = document.getElementById('raven-logo-path')
+        if (logoPath) logoPath.style.strokeDashoffset = logoPathLen * (1 - easeOut(drawP))
+
+        const pA = norm(p, 0.15, 0.28)
+        const pAe = easeInOut(pA)
+
+        const logoSvgEl = document.getElementById('raven-logo-svg')
+        const targetSvg = document.getElementById('target-logo-svg')
+        const heroLogoEl = document.getElementById('hero-logo')
+        const heroSubEl = document.getElementById('hero-sub')
+
+        // Fade Hero Text
+        if (heroLogoEl) heroLogoEl.style.opacity = p > 0.08 ? String(Math.max(0, lerp(1, 0, easeIn(norm(p, 0.08, 0.14))))) : '1'
+        if (heroSubEl) heroSubEl.style.opacity = p > 0.08 ? String(Math.max(0, lerp(1, 0, easeIn(norm(p, 0.08, 0.13))))) : '1'
+
+        // PIXEL-PERFECT LOGO MORPHING
+        if (logoSvgEl && targetSvg) {
+          if (pA <= 0) {
+            logoSvgEl.style.transform = ''
+            logoSvgEl.style.opacity = '1'
+            targetSvg.style.opacity = '0'
+          } else if (pA >= 1) {
+            logoSvgEl.style.opacity = '0'
+          } else {
+            const prevTransform = logoSvgEl.style.transform
+            logoSvgEl.style.transform = 'none'
+            const srcRect = logoSvgEl.getBoundingClientRect()
+            logoSvgEl.style.transform = prevTransform 
+
+            const srcCX = srcRect.left + srcRect.width / 2
+            const srcCY = srcRect.top + srcRect.height / 2
+
+            const tgtRect = targetSvg.getBoundingClientRect()
+            const tgtCX = tgtRect.left + tgtRect.width / 2
+            const tgtCY = tgtRect.top + tgtRect.height / 2
+
+            const endScale = tgtRect.width / srcRect.width
+            const s = lerp(1, endScale, pAe)
+            const tx = lerp(0, tgtCX - srcCX, pAe)
+            const ty = lerp(0, tgtCY - srcCY, pAe)
+
+            logoSvgEl.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`
+            logoSvgEl.style.opacity = pAe > 0.92 ? String(lerp(1, 0, norm(pAe, 0.92, 1))) : '1'
+            targetSvg.style.opacity = pAe > 0.85 ? String(lerp(0, 1, norm(pAe, 0.85, 1))) : '0'
+
+            // Glow & Stroke Transition
+            if (pA < 0.55) {
+              logoSvgEl.style.filter = 'drop-shadow(0 0 20px rgba(255,255,255,0.6)) drop-shadow(0 0 60px rgba(255,255,255,0.25))'
+            } else {
+              const t = norm(pA, 0.55, 1)
+              logoSvgEl.style.filter = `drop-shadow(0 0 ${lerp(20, 12, t)}px rgba(255,255,255,${lerp(0.6, 0, t)})) drop-shadow(0 0 ${lerp(0, 20, t)}px rgba(74,222,128,${lerp(0, 0.5, t)}))`
+            }
+            if (logoPath) logoPath.style.stroke = '#FFFFFF'
+          }
+        }
+
+        // ── Sub-phase B: Dashboard Reveal (0.13 → 0.28) ──────
+        const pB = norm(p, 0.13, 0.28)
+        const pBe = easeOut(pB)
+
+        // Keep parent opacity 1 during morph so the laser line stays 100% bright
+        if (p < 0.28) {
+            premiumDash.style.opacity = String(pBe);
+            premiumDash.style.transform = `scale(${lerp(0.96, 1, pBe)})`;
+        } else if (p >= 0.28 && p < 0.5) {
+            premiumDash.style.opacity = '1'; 
+            premiumDash.style.transform = 'scale(1)';
+        } else {
+            premiumDash.style.opacity = '0';
+        }
+
+        // =========================================================================
+        // 🚀 STORYTELLING HANDOFF: FADE UI RAPIDLY, KEEP LASER BRIGHT
+        // =========================================================================
+        const dashShell = document.getElementById('dash-shell');
+        const dashChatMain = document.getElementById('dash-chat-main');
+        const pFlatten = norm(p, 0.28, 0.35); 
+        const flyCurve = easeIn(pFlatten);
+        
+        // Dynamically control the top green line pseudo-element
+        let dynStyle = document.getElementById('dynamic-dash-style');
+        if (!dynStyle) {
+            dynStyle = document.createElement('style');
+            dynStyle.id = 'dynamic-dash-style';
+            document.head.appendChild(dynStyle);
+        }
+
+        if (p > 0.28 && p < 0.5) {
+            if (dashShell) dashShell.style.overflow = 'visible';
+            if (dashChatMain) dashChatMain.style.overflow = 'visible';
+            premiumDash.style.pointerEvents = 'none'; 
+
+            // Fade out ONLY the UI components rapidly (1.5x speed)
+            const uiOpacity = Math.max(0, lerp(1, 0, flyCurve * 1.5));
+
+            if (dashShell) {
+                dashShell.style.background = `rgba(10, 14, 20, ${lerp(0.72, 0, flyCurve * 1.5)})`;
+                dashShell.style.borderColor = `rgba(255, 255, 255, ${lerp(0.07, 0, flyCurve * 1.5)})`;
+                dashShell.style.boxShadow = 'none';
+            }
+
+            dynStyle.innerHTML = `#dash-shell::before { opacity: ${uiOpacity} !important; }`;
+
+            const chatElements = document.querySelectorAll('#dash-sidebar, #dash-chat-header, .dash-chat-tagline, .dash-chat-subtagline, #dash-chat-input-row');
+            chatElements.forEach(el => { el.style.opacity = String(uiOpacity); });
+
+            // FLATTEN THE TARGET LOGO AND FLY IT UP (Stays 100% Bright)
+            if (targetSvg) {
+                targetSvg.style.opacity = '1';
+                
+                const moveUp = lerp(0, -window.innerHeight * 0.55, flyCurve);
+                const scaleX = lerp(1, 40, flyCurve);
+                const scaleY = lerp(1, 0.005, flyCurve);
+                
+                targetSvg.style.transform = `translateY(${moveUp}px) scaleX(${scaleX}) scaleY(${scaleY})`;
+                
+                const targetPath = targetSvg.querySelector('path');
+                if (targetPath) targetPath.style.stroke = '#4ADE80';
+                targetSvg.style.filter = `drop-shadow(0 0 ${lerp(20, 80, flyCurve)}px rgba(74, 222, 128, 1))`;
+            }
+        } else if (p <= 0.28) {
+            // Reset state when scrolling up
+            if (dashShell) {
+                dashShell.style.overflow = 'hidden';
+                dashShell.style.background = 'rgba(10, 14, 20, 0.72)';
+                dashShell.style.borderColor = 'rgba(255, 255, 255, 0.07)';
+                dashShell.style.boxShadow = '0 0 0 1px rgba(74, 222, 128, 0.08), 0 60px 120px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06)';
+            }
+            if (dashChatMain) dashChatMain.style.overflow = 'hidden';
+            
+            dynStyle.innerHTML = `#dash-shell::before { opacity: 1 !important; }`;
+            premiumDash.style.pointerEvents = 'auto';
+
+            const chatElements = document.querySelectorAll('#dash-sidebar, #dash-chat-header, .dash-chat-tagline, .dash-chat-subtagline, #dash-chat-input-row');
+            chatElements.forEach(el => { el.style.opacity = '1'; });
+
+            if (targetSvg) {
+                targetSvg.style.transform = 'translateY(0px) scaleX(1) scaleY(1)';
+                targetSvg.style.filter = 'drop-shadow(0 0 18px rgba(74, 222, 128, 0.55)) drop-shadow(0 0 40px rgba(74, 222, 128, 0.22))';
+                const targetPath = targetSvg.querySelector('path');
+                if (targetPath) targetPath.style.stroke = '#FFFFFF';
+            }
+        }
+
+        // ── PHASE 2: CHAOS SCAN ──
+        const p2 = norm(p, 0.35, 0.5) 
+        
+        if (p >= 0.28 && p <= 0.55) {
+          phase2.style.opacity = p < 0.35 ? norm(p, 0.28, 0.35) : p > 0.5 ? lerp(1, 0, norm(p, 0.5, 0.55)) : 1
+          phase2.style.pointerEvents = 'auto'
+        } else {
+          phase2.style.opacity = 0
+          phase2.style.pointerEvents = 'none'
+        }
+
+        // Handoff to scan line
+        if (pFlatten >= 1) {
+             if(targetSvg) targetSvg.style.opacity = '0';
+             scanLine.style.opacity = '1';
+        } else {
+             scanLine.style.opacity = '0';
+        }
+
+        const scanY = lerp(-2, 102, easeInOut(p2))
+        scanLine.style.top = scanY + '%'
+
+        // =========================================================================
+        // 🚀 Float numbers & Chaos lines Logic (STRICTLY AFTER CHAT FADES)
+        // =========================================================================
+        floatNums.forEach((el, i) => {
+          const yPct = parseFloat(el.style.top) / 100;
+          const scanned = scanY / 100 > yPct + 0.05;
+          
+          // Wait until p=0.33 (chat is gone), finish by p=0.35 (before scan drops)
+          const appearDelay = (1 - yPct) * 0.01; 
+          const appearP = norm(p, 0.33 + appearDelay, 0.34 + appearDelay);
+          const fadeOutP = lerp(1, 0, norm(p2, 0.6, 1));
+          
+          const baseOp = p2 < 0.6 ? appearP : fadeOutP;
+          el.style.opacity = scanned ? 0 : baseOp * (0.4 + 0.6 * Math.sin(Date.now() * 0.003 + i));
+        });
+
+        chaosData.forEach((item, i) => {
+          const lineYPct = (item.y / 900) * 100;
+          const isScanned = scanY > lineYPct - 2;
+          const transitionT = clamp((scanY - lineYPct + 2) / 8, 0, 1);
+          const eT = easeOut(transitionT);
+
+          if (isScanned) {
+            item.path.style.opacity = lerp(1, 0, eT);
+            item.calmPath.style.opacity = eT * 0.6;
+          } else {
+            const reverseIdx = chaosData.length - 1 - i; 
+            const appearDelay = reverseIdx * 0.0004; 
+            
+            // Fade in strictly between 0.33 and 0.345 (after chat UI fades out)
+            item.path.style.opacity = String(norm(p, 0.33 + appearDelay, 0.34 + appearDelay));
+            item.calmPath.style.opacity = '0';
+          }
+        });
+
+        const trendProgress = clamp((p2 - 0.3) / 0.7, 0, 1)
+        greenTrend.style.strokeDashoffset = lerp(1800, 0, easeOut(trendProgress))
+        greenTrend.style.opacity = trendProgress > 0 ? 1 : 0
+
+        const p2textT = norm(p2, 0.7, 0.95)
+        p2text.style.opacity = easeOut(p2textT)
+        p2text.style.transform = `translateX(-50%) translateY(${lerp(20, 0, easeOut(p2textT))}px)`
+
+        // ── PHASE 3 (CORE) ──
+        // Fade out earlier (by 0.69) so Phase 4 has a clean slate
+        const p3 = norm(p, 0.54, 0.69)
+        if (p >= 0.52 && p <= 0.70) {
+          // Fade in 0.52 -> 0.56, Fade out 0.66 -> 0.69
+          phase3.style.opacity = p < 0.56 ? easeOut(norm(p, 0.52, 0.56)) : p > 0.66 ? lerp(1, 0, norm(p, 0.66, 0.69)) : 1
+          phase3.style.pointerEvents = p < 0.66 ? 'auto' : 'none'
+        } else {
+          phase3.style.opacity = 0
+          phase3.style.pointerEvents = 'none'
+        }
+
+        feedLine.style.height = lerp(0, 80, easeOut(norm(p3, 0, 0.25))) + 'px'
+        node1.classList.toggle('active', norm(p3, 0.2, 0.4) > 0.5)
+        node2.classList.toggle('active', norm(p3, 0.4, 0.6) > 0.5)
+        node3.classList.toggle('active', norm(p3, 0.6, 0.8) > 0.5)
+        
+        const coreCard = document.getElementById('core-card')
+        if(coreCard) coreCard.style.transform = `scale(${lerp(0.85, 1, easeOut(norm(p3, 0, 0.25)))})`
+
+        // ── PHASE 4 (BENTO) & PHASE 5 (ASSEMBLY) ──
+        const p4 = norm(p, 0.70, 0.82); 
+        const pAssemble = norm(p, 0.82, 0.94); 
+        const assembleCurve = easeInOut(pAssemble);
+
+        if (p >= 0.70 && p <= 0.98) {
+          phase4.style.opacity = p < 0.74 ? easeOut(norm(p, 0.70, 0.74)) : 1;
+          phase4.style.pointerEvents = p < 0.82 ? 'auto' : 'none';
+        } else {
+          phase4.style.opacity = 0;
+          phase4.style.pointerEvents = 'none';
+        }
+
+        const phoneCarousel = document.getElementById('phone-carousel');
+        
+        // 🚀 CRITICAL FIX: Lock the carousel to Slide 1 during the flight!
+        if (p < 0.95 && phoneCarousel) {
+            phoneCarousel.scrollLeft = 0; 
+        }
+
+        // Lock phone in place so we can measure target rects perfectly
+        if (phoneWrap) phoneWrap.style.transform = `translateY(0px)`;
+
+        const targetMap = {
+            'b1': document.querySelector('.target-b1'),
+            'b2': document.querySelector('.target-b2'),
+            'b4': document.querySelector('.target-b4')
+        };
+
+        // Reset cache if scrolled back up
+        if (p < 0.70) {
+            bentoCells.forEach(cell => cell.absCX = null);
+        }
+
+        // Cache absolute centers safely
+        bentoCells.forEach((cell) => {
+            if (!cell.absCX && p > 0.75) {
+                cell.style.transition = 'none'; // stop rubber-banding
+                const oldTx = cell.style.transform;
+                cell.style.transform = 'translate(0px, 0px) scale(1)';
+                
+                const rect = cell.getBoundingClientRect();
+                if (rect.width > 0) {
+                    cell.absCX = rect.left + rect.width / 2;
+                    cell.absCY = rect.top + rect.height / 2;
+                    cell.startW = rect.width;
+                }
+                
+                cell.style.transform = oldTx;
+                cell.offsetHeight; // force reflow
+                cell.style.transition = ''; // restore css transition
+            }
+        });
+
+        // Calculate actual phone center for unused cells
+        let currentPhoneCX = window.innerWidth / 2;
+        let currentPhoneCY = window.innerHeight / 2;
+        const phoneMockupNode = document.getElementById('phone-mockup');
+        if (phoneMockupNode) {
+            const pRect = phoneMockupNode.getBoundingClientRect();
+            if (pRect.width > 0) {
+                currentPhoneCX = pRect.left + pRect.width / 2;
+                currentPhoneCY = pRect.top + pRect.height / 2;
+            }
+        }
+
+        // Animate Assembly
+        bentoCells.forEach((cell, i) => {
+          if (pAssemble === 0) {
+              cell.style.transition = ''; 
+              cell.style.transform = '';
+              cell.style.opacity = '';
+              const isRevealed = p4 > (0.1 + i * 0.08);
+              cell.classList.toggle('show', isRevealed);
+          } else if (pAssemble > 0 && cell.absCX) {
+              cell.style.transition = 'none'; // Kill CSS transition during flight to avoid lag
+              
+              let tCard = null;
+              if (cell.classList.contains('b1')) tCard = targetMap['b1'];
+              if (cell.classList.contains('b2')) tCard = targetMap['b2'];
+              if (cell.classList.contains('b4')) tCard = targetMap['b4'];
+
+              const yOffset = 25; 
+
+              if (tCard) {
+                  const tRect = tCard.getBoundingClientRect();
+                  const tCX = tRect.left + tRect.width / 2;
+                  const tCY = tRect.top + tRect.height / 2;
+                  
+                  const dx = tCX - cell.absCX;
+                  const dy = (tCY - cell.absCY) + yOffset;
+                  const targetScale = tRect.width / cell.startW;
+
+                  cell.style.transform = `translate(${lerp(0, dx, assembleCurve)}px, ${lerp(0, dy, assembleCurve)}px) scale(${lerp(1, targetScale, assembleCurve)})`;
+                  cell.style.opacity = String(lerp(1, 0, norm(pAssemble, 0.85, 1))); 
+              } else {
+                  const dx = currentPhoneCX - cell.absCX;
+                  const dy = currentPhoneCY - cell.absCY + yOffset; 
+
+                  cell.style.transform = `translate(${lerp(0, dx, assembleCurve)}px, ${lerp(0, dy, assembleCurve)}px) scale(${lerp(1, 0.1, assembleCurve)})`;
+                  cell.style.opacity = String(lerp(1, 0, norm(pAssemble, 0.7, 1)));
+              }
+          }
+        });
+
+        // ── PHONE (APP MOCKUP) ──
+        const pPhoneReveal = norm(p, 0.92, 0.96); // Real phone UI replaces the assembled blocks
+        const pPhoneText = norm(p, 0.95, 0.98);   // Buttons and title slide in
+
+        if (p >= 0.85) {
+          phoneSection.style.opacity = '1';
+          phoneSection.style.pointerEvents = 'auto';
+        } else {
+          phoneSection.style.opacity = '0';
+          phoneSection.style.pointerEvents = 'none';
+        }
+
+        if (phoneMockupNode) {
+            phoneMockupNode.style.opacity = String(easeOut(pPhoneReveal));
+            phoneMockupNode.style.transform = 'scale(1)'; // keep steady
+        }
+
+        const phoneTitle = document.getElementById('phone-title');
+        const storeBtns = document.getElementById('store-buttons');
+        
+        if (phoneTitle) {
+            phoneTitle.style.opacity = String(easeOut(pPhoneText));
+            phoneTitle.style.transform = `translateY(${lerp(15, 0, easeOut(pPhoneText))}px)`;
+        }
+        if (storeBtns) {
+            storeBtns.style.opacity = String(easeOut(pPhoneText));
+            storeBtns.style.transform = `translateX(${lerp(-20, 0, easeOut(pPhoneText))}px)`;
+        }
+
+        raf = requestAnimationFrame(render);
+      }
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      function animateNumbers() {
+        floatNums.forEach((el, i) => {
+          const t = Date.now() * 0.001
+          el.style.transform = `translateY(${Math.sin(t * 0.5 + i) * 5}px)`
+        })
+        requestAnimationFrame(animateNumbers)
+      }
+
+      generateChaosLines()
+      spawnParticles()
+      spawnFloatNums()
+
+      let logoPathLen = 2000
+
+      window.addEventListener('load', () => {
+        const logoPath = document.getElementById('raven-logo-path')
+        if (logoPath && logoPath.getTotalLength) {
+          logoPathLen = Math.ceil(logoPath.getTotalLength())
+          logoPath.style.strokeDasharray = logoPathLen
+          logoPath.style.strokeDashoffset = logoPathLen
+        }
+        if (premiumDash) {
+          premiumDash.style.opacity = 0
+        }
+        // Ensure the hero logo text starts visible
+        const heroLogoEl = document.getElementById('hero-logo')
+        if (heroLogoEl) {
+          heroLogoEl.style.opacity = '1'
+        }
+        initPhoneCarousel();
+      })
+
+      render()
+      animateNumbers()
+
+      // Prevent scroll jump on load
+      window.scrollTo(0, 0)
+
+    </script>
+  </body>
+</html>

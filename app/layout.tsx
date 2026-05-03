@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 // ─── Google Fonts (mirrors Flutter's GoogleFonts.outfit + GoogleFonts.inter) ──
 const outfit = Outfit({
@@ -42,7 +43,9 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} ${inter.variable} font-inter antialiased bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <LanguageProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -1,0 +1,653 @@
+<!-- Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Nav -->
+    <nav id="nav">
+      <div id="nav-logo">RAVEN</div>
+      <button id="nav-cta">START</button>
+    </nav>
+
+
+
+    <!-- Main Stage (fixed) -->
+    <div id="stage">
+      <div class="glow-orb" id="orb1"></div>
+      <div class="glow-orb" id="orb2"></div>
+      <div id="bg-gradient"></div>
+      <div id="particles"></div>
+
+      <!-- PHASE 1: LOGO DRAW & DASHBOARD REVEAL -->
+      <div id="phase1">
+        <!-- Logo Draw Stage (center-screen, scales down & becomes chart line) -->
+        <div id="logo-draw-stage">
+          <div id="raven-svg-wrap">
+            <svg
+              id="raven-logo-svg"
+              viewBox="10 60 170 145"
+              preserveAspectRatio="xMidYMid meet"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <filter
+                  id="logo-glow"
+                  x="-60%"
+                  y="-60%"
+                  width="220%"
+                  height="220%"
+                >
+                  <feGaussianBlur stdDeviation="1.8" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <path
+                id="raven-logo-path"
+                d="m 42.398955,174.66625 c 2.364485,-9.40827 4.05641,-19.23246 8.6833,-27.85247 4.316587,-5.27252 6.839501,3.7835 8.219495,7.01558 0.553566,4.05645 6.028114,9.53741 8.114869,3.15487 4.332304,-10.57344 4.695368,-22.2921 8.865183,-32.89082 3.955844,-7.15208 7.824972,3.4296 8.275918,7.29428 1.902153,4.4944 2.176147,13.28502 8.427264,13.32501 5.207494,-2.56775 6.33981,-9.1688 9.936686,-13.34495 6.57229,-8.97556 18.32124,-10.77617 28.39272,-13.33863 10.71311,-2.50938 21.21921,-6.09771 30.88842,-11.3853 5.37305,-1.39598 -0.0618,9.28598 -2.04065,11.01856 -7.32968,1.4069 -7.74521,1.3585 -9.18108,2.82676 -2.66388,2.72398 2.48268,2.72883 1.69526,6.8397 -1.21186,6.3267 -13.32037,11.42602 -21.36004,13.70649 -4.08935,4.50372 8.48138,0.0278 7.27996,3.22828 -3.07615,4.30755 -8.84059,5.92604 -13.71423,7.51765 -6.07799,1.54704 -12.86078,2.87229 -17.3003,7.59875 3.39493,2.74642 7.75242,4.51598 11.71959,6.4777 6.7013,3.14816 13.74736,5.4524 20.66446,8.05018 1.00029,4.19558 -7.54694,3.52571 -10.7025,4.57364 -8.06642,0.7658 -17.72937,-0.57925 -22.8384,-7.5533 -2.23312,-3.38296 -2.20385,-8.65559 1.12722,-11.50227 -4.38416,-2.93957 -8.342303,-7.10778 -8.780221,-12.51186"
+                fill="none"
+                stroke="#FFFFFF"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                filter="url(#logo-glow)"
+              />
+            </svg>
+            <div id="hero-logo">Raven AI</div>
+            <div id="hero-sub">MARKET INTELLIGENCE · EVERY MOMENT</div>
+          </div>
+        </div>
+
+        <!-- Premium Glassmorphism Dashboard — AI Chat Layout -->
+        <div id="premium-dashboard">
+          <div id="dash-shell">
+            <!-- ── Sidebar ── -->
+            <div id="dash-sidebar">
+              <!-- Logo -->
+              <div class="dash-logo-mark" id="dash-logo-mark">RAVEN AI</div>
+
+              <!-- New Chat button -->
+              <button class="dash-new-chat-btn">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <line
+                    x1="6.5"
+                    y1="1"
+                    x2="6.5"
+                    y2="12"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    x1="1"
+                    y1="6.5"
+                    x2="12"
+                    y2="6.5"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                New Chat
+              </button>
+
+              <!-- Nav -->
+              <div class="dash-nav-item active">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M1 7C1 3.686 3.686 1 7 1s6 2.686 6 6-2.686 6-6 6S1 10.314 1 7z"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                  />
+                  <circle cx="7" cy="7" r="2" fill="currentColor" />
+                </svg>
+                AI Chat
+              </div>
+              <div class="dash-nav-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <rect
+                    x="1"
+                    y="3"
+                    width="12"
+                    height="9"
+                    rx="1.5"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                  />
+                  <path
+                    d="M4 3V2M10 3V2"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                    stroke-linecap="round"
+                  />
+                  <path d="M1 6h12" stroke="currentColor" stroke-width="1.3" />
+                </svg>
+                Watchlist
+              </div>
+              <div class="dash-nav-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M1 10L4.5 6l2.5 2.5L10 4l3 3"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                AI Radar
+              </div>
+              <div class="dash-nav-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M7 1.5a4 4 0 0 1 4 4v2.5l1.5 2H1.5L3 8V5.5a4 4 0 0 1 4-4z"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M5.5 11.5a1.5 1.5 0 0 0 3 0"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                  />
+                </svg>
+                Notifications
+              </div>
+
+              <!-- Profile -->
+              <div class="dash-profile">
+                <div class="dash-avatar">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <circle
+                      cx="7"
+                      cy="5"
+                      r="2.5"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                    />
+                    <path
+                      d="M1.5 12.5c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <div class="dash-profile-text">
+                  <div class="dash-profile-name">Trader Profile</div>
+                </div>
+              </div>
+            </div>
+            <!-- end sidebar -->
+
+            <!-- ── Main Chat Area ── -->
+            <div id="dash-chat-main">
+              <!-- Header -->
+              <div id="dash-chat-header">
+                <div class="dash-chat-header-left">
+                  <div class="dash-chat-title">AI Chat</div>
+                  <div class="dash-chat-subtitle">
+                    Real-time market intelligence
+                  </div>
+                </div>
+                <div class="dash-markets-badge">
+                  <span class="live-dot"></span>
+                  Markets Open
+                </div>
+              </div>
+
+              <!-- Center content — Raven logo + tagline -->
+              <div id="dash-chat-center">
+                <!-- TARGET SVG: exact replica of the hero logo. Starts invisible.
+                     The morph animation lands #raven-logo-svg here pixel-perfectly,
+                     then this fades in at 100% progress to complete the handoff. -->
+                <svg
+                  id="target-logo-svg"
+                  viewBox="10 60 170 145"
+                  preserveAspectRatio="xMidYMid meet"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <filter
+                      id="target-glow"
+                      x="-50%"
+                      y="-50%"
+                      width="200%"
+                      height="200%"
+                    >
+                      <feGaussianBlur stdDeviation="4" result="b" />
+                      <feMerge>
+                        <feMergeNode in="b" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  <path
+                    d="m 42.398955,174.66625 c 2.364485,-9.40827 4.05641,-19.23246 8.6833,-27.85247 4.316587,-5.27252 6.839501,3.7835 8.219495,7.01558 0.553566,4.05645 6.028114,9.53741 8.114869,3.15487 4.332304,-10.57344 4.695368,-22.2921 8.865183,-32.89082 3.955844,-7.15208 7.824972,3.4296 8.275918,7.29428 1.902153,4.4944 2.176147,13.28502 8.427264,13.32501 5.207494,-2.56775 6.33981,-9.1688 9.936686,-13.34495 6.57229,-8.97556 18.32124,-10.77617 28.39272,-13.33863 10.71311,-2.50938 21.21921,-6.09771 30.88842,-11.3853 5.37305,-1.39598 -0.0618,9.28598 -2.04065,11.01856 -7.32968,1.4069 -7.74521,1.3585 -9.18108,2.82676 -2.66388,2.72398 2.48268,2.72883 1.69526,6.8397 -1.21186,6.3267 -13.32037,11.42602 -21.36004,13.70649 -4.08935,4.50372 8.48138,0.0278 7.27996,3.22828 -3.07615,4.30755 -8.84059,5.92604 -13.71423,7.51765 -6.07799,1.54704 -12.86078,2.87229 -17.3003,7.59875 3.39493,2.74642 7.75242,4.51598 11.71959,6.4777 6.7013,3.14816 13.74736,5.4524 20.66446,8.05018 1.00029,4.19558 -7.54694,3.52571 -10.7025,4.57364 -8.06642,0.7658 -17.72937,-0.57925 -22.8384,-7.5533 -2.23312,-3.38296 -2.20385,-8.65559 1.12722,-11.50227 -4.38416,-2.93957 -8.342303,-7.10778 -8.780221,-12.51186"
+                    fill="none"
+                    stroke="#4ADE80"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    filter="url(#target-glow)"
+                  />
+                </svg>
+                <div class="dash-chat-tagline">
+                  Raven AI is watching the markets.
+                </div>
+                <div class="dash-chat-subtagline">What's our target?</div>
+              </div>
+
+              <!-- Input bar -->
+              <div id="dash-chat-input-row">
+                <div class="dash-chat-input-wrap">
+                  <input
+                    class="dash-chat-input"
+                    type="text"
+                    placeholder="Ask Raven AI for market insights..."
+                    readonly
+                  />
+                  <div class="dash-chat-send-btn">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                      <path
+                        d="M1 12L12 6.5 1 1v4.5l8 2-8 2V12z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end chat main -->
+          </div>
+          <!-- end dash-shell -->
+        </div>
+        <!-- end premium-dashboard -->
+      </div>
+      <!-- end phase1 -->
+
+      <!-- PHASE 2 -->
+      <div id="phase2">
+        <div id="scan-line"></div>
+        <svg
+          id="chaos-svg"
+          viewBox="0 0 1440 900"
+          preserveAspectRatio="xMidYMid slice"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <filter id="red-glow">
+              <feGaussianBlur stdDeviation="4" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="green-glow-strong">
+              <feGaussianBlur stdDeviation="6" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Chaos red lines - 20 jagged paths -->
+          <g id="chaos-lines" filter="url(#red-glow)"></g>
+          <!-- Clean gray lines (post-scan) -->
+          <g id="calm-lines"></g>
+          <!-- Green trend line -->
+          <path
+            id="green-trend"
+            d=""
+            stroke="#4ADE80"
+            stroke-width="3"
+            fill="none"
+            filter="url(#green-glow-strong)"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-dasharray="1800"
+            stroke-dashoffset="1800"
+          />
+        </svg>
+        <div id="phase2-text">From market noise, to clear opportunity</div>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div id="phase3">
+        <div id="feed-line"></div>
+        <div id="core-card">
+          <div class="core-label">● PROCESSING CORE ●</div>
+          <div class="core-title">Raven Intelligence Engine</div>
+          <svg width="100%" height="3" style="margin-bottom: 0.5rem">
+            <line
+              x1="0"
+              y1="1.5"
+              x2="100%"
+              y2="1.5"
+              stroke="url(#sep-grad)"
+              stroke-width="1"
+            />
+            <defs>
+              <linearGradient id="sep-grad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="transparent" />
+                <stop offset="50%" stop-color="rgba(74,222,128,0.4)" />
+                <stop offset="100%" stop-color="transparent" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div id="nodes-container">
+            <div class="node" id="node1">
+              <div class="node-dot"></div>
+              <div class="node-text">
+                <div class="node-name">Sentiment Analysis</div>
+                <div class="node-desc">AI News Feed Evaluation</div>
+              </div>
+              <div class="node-val">+87%</div>
+            </div>
+            <div class="node" id="node2">
+              <div class="node-dot"></div>
+              <div class="node-text">
+                <div class="node-name">Trade Momentum</div>
+                <div class="node-desc">High Probability Detection</div>
+              </div>
+              <div class="node-val">↑ 2.4x</div>
+            </div>
+            <div class="node" id="node3">
+              <div class="node-dot"></div>
+              <div class="node-text">
+                <div class="node-name">Risk Management</div>
+                <div class="node-desc">Capital Preservation Protocol</div>
+              </div>
+              <div class="node-val">⬡ A+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 4 -->
+      <div id="phase4">
+        <div id="bento-grid">
+          <!-- B1: Main chart card -->
+          <div class="bento-cell b1">
+            <div class="bento-tag">PORTFOLIO PERFORMANCE</div>
+            <div class="bento-title">Exceptional Returns Powered by AI</div>
+            <div class="bento-val">+34.8%</div>
+            <span class="bento-badge badge-green">↑ +12.3% this month</span>
+            <svg
+              id="mini-chart"
+              viewBox="0 0 300 80"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(74,222,128,0.3)" />
+                  <stop offset="100%" stop-color="rgba(74,222,128,0)" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0,70 L30,60 L60,55 L90,45 L120,40 L150,30 L180,25 L210,15 L240,18 L270,10 L300,5 L300,80 L0,80 Z"
+                fill="url(#chart-fill)"
+              />
+              <path
+                d="M0,70 L30,60 L60,55 L90,45 L120,40 L150,30 L180,25 L210,15 L240,18 L270,10 L300,5"
+                stroke="#4ADE80"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <!-- B2 -->
+          <div class="bento-cell b2">
+            <div class="bento-tag">SMART ALERTS</div>
+            <div class="bento-title">Real-time Signals at Peak Opportunity</div>
+            <div class="bento-val" style="font-size: 1.8rem">2,847</div>
+            <div class="bento-desc">alert sent today</div>
+          </div>
+          <!-- B3 -->
+          <div
+            class="bento-cell b3"
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              text-align: center;
+            "
+          >
+            <div style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--green); display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"></path></svg>
+            </div>
+            <div class="bento-tag">SPEED</div>
+            <div class="bento-val" style="font-size: 1.6rem">12ms</div>
+            <div class="bento-desc" style="font-size: 0.65rem">
+              Response Time
+            </div>
+          </div>
+          <!-- B4 -->
+          <div class="bento-cell b4">
+            <div class="bento-tag">MARKET THREADS</div>
+            <div class="bento-title">Smarter tracking across 50+ markets</div>
+            <div
+              style="
+                display: flex;
+                gap: 0.4rem;
+                margin-top: 0.75rem;
+                flex-wrap: wrap;
+              "
+            >
+              <span class="bento-badge badge-green">AAPL +2.1%</span>
+              <span class="bento-badge badge-red">TSLA -1.3%</span>
+              <span class="bento-badge badge-green">NVDA +4.8%</span>
+            </div>
+          </div>
+          <!-- B5 -->
+          <div
+            class="bento-cell b5"
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              text-align: center;
+            "
+          >
+            <div style="font-size: 2.2rem; margin-bottom: 0.3rem; color: var(--green); display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M208,40H48A16,16,0,0,0,32,56v58.77c0,89.61,75.82,119.34,91,124.39a15.53,15.53,0,0,0,10,0c15.2-5.05,91-34.78,91-124.39V56A16,16,0,0,0,208,40Z"></path></svg>
+            </div>
+            <div class="bento-title" style="font-size: 0.85rem">
+              Capital Protection
+            </div>
+          </div>
+          <!-- B6 -->
+          <div class="bento-cell b6">
+            <div class="bento-tag">USER TRUST</div>
+            <div class="bento-val" style="font-size: 1.8rem">98.4%</div>
+            <div class="bento-desc">Customer Satisfaction</div>
+            <div style="display: flex; gap: 2px; margin-top: 0.5rem">
+              <span style="color: var(--green); font-size: 0.9rem">★★★★★</span>
+            </div>
+          </div>
+          <!-- B7 -->
+          <div
+            class="bento-cell b7"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <div>
+              <div class="bento-tag">START YOUR JOURNEY</div>
+              <div class="bento-title">Join over 50,000 smart traders</div>
+            </div>
+            <button
+              style="
+                padding: 0.7rem 1.5rem;
+                background: var(--green);
+                color: var(--black);
+                border: none;
+                border-radius: 100px;
+                font-family: 'Outfit', sans-serif;
+                font-weight: 700;
+                font-size: 0.9rem;
+                cursor: pointer;
+                white-space: nowrap;
+                flex-shrink: 0;
+              "
+            >
+              Start Now →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHONE SECTION -->
+      <div id="phone-section">
+        <div id="phone-title">Smart Trading in Your Pocket</div>
+        <div id="phone-wrap">
+          <div id="store-buttons">
+            <div class="store-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path
+                  d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+                />
+              </svg>
+              <div class="store-btn-text">
+                <div class="store-sub">Download on</div>
+                <div class="store-name">App Store</div>
+              </div>
+              <div class="qr-popup">
+                <div class="qr-inner" id="qr1"></div>
+              </div>
+            </div>
+            <div class="store-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path
+                  d="M3.18 23.76c.3.17.64.22.97.15l12.81-7.4-2.81-2.82-10.97 10.07zM.61 1.46C.23 1.83 0 2.43 0 3.22v17.56c0 .79.23 1.39.61 1.76l.09.09 9.83-9.83v-.23L.7 1.38l-.09.08zm20.44 9.35-2.63-1.52-3.12 3.12 3.12 3.12 2.65-1.52c.75-.44.75-1.16 0-1.6l-.02-.6zM3.18.24l12.81 7.4-2.81 2.82L3.18.24z"
+                />
+              </svg>
+              <div class="store-btn-text">
+                <div class="store-sub">Available on</div>
+                <div class="store-name">Google Play</div>
+              </div>
+              <div class="qr-popup">
+                <div class="qr-inner" id="qr2"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="phone-mockup">
+            <div class="phone-carousel" id="phone-carousel">
+              
+              <div class="phone-slide">
+                <div class="phone-header">
+                  <span class="phone-logo">RAVEN</span>
+                  <span style="font-size: 0.65rem; color: var(--green)">● LIVE</span>
+                </div>
+                <div class="phone-card target-b1">
+                  <div style="font-size: 0.5rem; color: var(--green); letter-spacing: 0.1em; margin-bottom: 2px;">PORTFOLIO PERFORMANCE</div>
+                  <div class="phone-price">+34.8%</div>
+                  <svg class="phone-mini-chart" viewBox="0 0 160 35" preserveAspectRatio="none">
+                    <path d="M0,30 L20,25 L40,22 L60,15 L80,12 L100,8 L120,10 L140,5 L160,3" stroke="#4ADE80" stroke-width="1.5" fill="none"/>
+                  </svg>
+                </div>
+                <div class="phone-card target-b2" style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-size: 0.5rem; color: var(--green); letter-spacing: 0.1em; margin-bottom: 2px;">SMART ALERTS</div>
+                    <div class="phone-price" style="font-size: 1.1rem;">2,847</div>
+                  </div>
+                  <div style="font-size: 1.2rem; color: var(--green); display: flex; align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"></path></svg>
+                  </div>
+                </div>
+                <div class="phone-card target-b4">
+                  <div style="font-size: 0.5rem; color: var(--green); letter-spacing: 0.1em; margin-bottom: 6px;">MARKET THREADS</div>
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                    <span class="bento-badge badge-green" style="font-size: 0.45rem; padding: 0.15rem 0.4rem; margin:0;">AAPL +2.1%</span>
+                    <span class="bento-badge badge-red" style="font-size: 0.45rem; padding: 0.15rem 0.4rem; margin:0;">TSLA -1.3%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="phone-slide">
+                <div class="p-chat-center">
+                  <div class="phone-logo" style="font-size:1.8rem; margin-bottom:0.5rem;">RAVEN AI</div>
+                  <div style="font-size: 0.8rem; font-weight: 600; text-align: center; color: white;">Raven AI is watching the markets.<br><span style="color:var(--gray-light); font-weight:400; font-size:0.7rem;">What's our target?</span></div>
+                </div>
+                <div class="p-chat-input">Ask Raven AI for insights...</div>
+              </div>
+
+              <div class="phone-slide">
+                <div class="p-header-sm"><span>&lt;</span> Watchlist</div>
+                <div class="p-list-item">
+                  <div class="p-col"><div class="p-sym">AAPL</div><div class="p-sub">Apple Inc.</div></div>
+                  <div class="p-col"><div class="p-val">$189.30</div><div class="p-badge up">+4.6%</div></div>
+                  <div class="p-col" style="text-align:right;"><div class="p-sub">T1 $198.00</div><div class="p-sub">T2 $210.50</div></div>
+                </div>
+                <div class="p-list-item">
+                  <div class="p-col"><div class="p-sym">NVDA</div><div class="p-sub">NVIDIA Corp</div></div>
+                  <div class="p-col"><div class="p-val">$875.20</div><div class="p-badge up">+5.1%</div></div>
+                  <div class="p-col" style="text-align:right;"><div class="p-sub">T1 $920.00</div><div class="p-sub">T2 $980.00</div></div>
+                </div>
+                <div class="p-list-item">
+                  <div class="p-col"><div class="p-sym">TSLA</div><div class="p-sub">Tesla Inc.</div></div>
+                  <div class="p-col"><div class="p-val" style="color:var(--red)">$248.50</div><div class="p-badge dn">-7.4%</div></div>
+                  <div class="p-col" style="text-align:right;"><div class="p-sub">T1 $230.00</div><div class="p-sub">T2 $215.00</div></div>
+                </div>
+              </div>
+
+              <div class="phone-slide">
+                <div class="p-header-sm"><span>&lt;</span> AI Radar</div>
+                <div class="p-radar-card border-green">
+                  <div class="p-r-top"><div class="p-sym">NVDA</div><div class="p-sub">2 hours ago</div></div>
+                  <div class="p-r-bot">
+                    <div><div class="p-sub">Entry</div><div class="p-val-sm">$850.50</div></div>
+                    <div style="text-align:right;"><div class="p-sub">Max Return</div><div class="p-val-sm up">+4.2%</div></div>
+                  </div>
+                </div>
+                <div class="p-radar-card border-red">
+                  <div class="p-r-top"><div class="p-sym">TSLA</div><div class="p-sub">1 day ago</div></div>
+                  <div class="p-r-bot">
+                    <div><div class="p-sub">Entry</div><div class="p-val-sm">$175.20</div></div>
+                    <div style="text-align:right;"><div class="p-sub">Max Return</div><div class="p-val-sm dn">-3.8%</div></div>
+                  </div>
+                </div>
+                <div class="p-radar-card border-gray">
+                  <div class="p-r-top"><div class="p-sym">COIN</div><div class="p-sub">5 hours ago</div></div>
+                  <div class="p-r-bot">
+                    <div><div class="p-sub">Entry</div><div class="p-val-sm">$210.00</div></div>
+                    <div style="text-align:right;"><div class="p-sub">Max Return</div><div class="p-val-sm up">+1.5%</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="phone-slide">
+                <div class="p-header-sm"><span>&lt;</span> Notifications</div>
+                <div class="p-notif-card">
+                  <div class="p-notif-head"><span class="p-badge-outline">AI Radar</span> NVDA <span class="p-time">2m ago</span></div>
+                  <div class="p-notif-title">AI Radar Signal</div>
+                  <div class="p-notif-desc">NVDA is showing a Golden Cross pattern with high volume surge.</div>
+                </div>
+                <div class="p-notif-card">
+                  <div class="p-notif-head"><span class="p-badge-outline green">Price Alert</span> AAPL <span class="p-time">18m ago</span></div>
+                  <div class="p-notif-title">Price Alert Triggered</div>
+                  <div class="p-notif-desc">AAPL has reached your target price of $198.00.</div>
+                </div>
+              </div>
+
+            </div>
+            
+            <div class="phone-dots" id="phone-dots">
+              <div class="p-dot active"></div>
+              <div class="p-dot"></div>
+              <div class="p-dot"></div>
+              <div class="p-dot"></div>
+              <div class="p-dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end stage -->

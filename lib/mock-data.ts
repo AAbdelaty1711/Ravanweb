@@ -1,4 +1,4 @@
-import { WatchlistItem, RadarAnomaly, RavenNotification } from "../types/types";
+import { WatchlistItem, RadarAnomaly, RavenNotification } from "./types";
 import { stockFaviconUrl } from "./utils";
 
 // ─── Watchlist mock data (from watchlist_page.dart + add_stock_page.dart) ─────

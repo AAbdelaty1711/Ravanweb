@@ -22,23 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-
-const NAV_ITEMS = [
-  { href: "/", icon: MessageSquare, label: "AI Chat" },
-  { href: "/watchlist", icon: BookMarked, label: "Watchlist" },
-  { href: "/ai-radar", icon: Radar, label: "AI Radar" },
-  { href: "/notifications", icon: Bell, label: "Notifications" },
-];
-
-const RECENT_CHATS = [
-  { id: "1", label: "AAPL Trend Analysis" },
-  { id: "2", label: "NVDA Forecast Q2" },
-  { id: "3", label: "Market Summary" },
-];
-const OLDER_CHATS = [
-  { id: "4", label: "Portfolio Health" },
-  { id: "5", label: "Tech Sector Outlook" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 function RavenLogo({ className }: { className?: string }) {
   return (
@@ -56,28 +40,40 @@ function RavenLogo({ className }: { className?: string }) {
 function UserPopover({
   collapsed,
   onClose,
+  triggerRef,
 }: {
   collapsed: boolean;
   onClose: () => void;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
 }) {
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { dict, isRTL } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Prefetch programmatic route for instant UI response
+    router.prefetch("/dashboard/profile");
+    
     const handler = (e: MouseEvent) => {
+      if (triggerRef.current?.contains(e.target as Node)) return;
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [onClose]);
+  }, [onClose, triggerRef, router]);
 
   const items = [
-    { icon: User, label: "Profile", action: () => { router.push("/profile"); onClose(); } },
-    { icon: Settings, label: "Settings", action: () => { router.push("/profile"); onClose(); } },
-    { icon: CreditCard, label: "Upgrade to Pro", action: onClose },
-    { icon: HelpCircle, label: "Help & Support", action: onClose },
+    { icon: User, label: dict.sidebar.profile, action: () => { router.push("/dashboard/profile"); onClose(); } },
+    { icon: Settings, label: dict.sidebar.settings, action: () => { router.push("/dashboard/profile"); onClose(); } },
+    { icon: CreditCard, label: dict.sidebar.upgrade, action: onClose },
+    { icon: HelpCircle, label: dict.sidebar.help, action: onClose },
   ];
+
+  const handleLogout = () => {
+    document.cookie = "raven_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    router.push("/");
+    onClose();
+  };
 
   return (
     <motion.div
@@ -116,7 +112,7 @@ function UserPopover({
           <button
             key={label}
             onClick={action}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-start
                        hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors"
           >
             <Icon size={14} className="text-text-secondary-light dark:text-text-secondary-dark shrink-0" />
@@ -130,12 +126,12 @@ function UserPopover({
       {/* Logout */}
       <div className="border-t border-gray-100 dark:border-white/[0.06] py-1">
         <button
-          onClick={onClose}
-          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-start
                      hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
         >
           <LogOut size={14} className="text-red-500 shrink-0" />
-          <span className="font-inter text-[13px] text-red-500">Log out</span>
+          <span className="font-inter text-[13px] text-red-500">{dict.sidebar.logout}</span>
         </button>
       </div>
     </motion.div>
@@ -153,8 +149,26 @@ function SidebarContent({
   onClose?: () => void;
 }) {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
+  const { dict, isRTL } = useLanguage();
   const [showUserPopover, setShowUserPopover] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const navItems = [
+    { href: "/dashboard", icon: MessageSquare, label: dict.sidebar.aiChat },
+    { href: "/dashboard/watchlist", icon: BookMarked, label: dict.sidebar.watchlist },
+    { href: "/dashboard/ai-radar", icon: Radar, label: dict.sidebar.aiRadar },
+    { href: "/dashboard/notifications", icon: Bell, label: dict.sidebar.notifications },
+  ];
+
+  const recentChats = [
+    { id: "1", label: "AAPL Trend Analysis" },
+    { id: "2", label: "NVDA Forecast Q2" },
+    { id: "3", label: "Market Summary" },
+  ];
+  const olderChats = [
+    { id: "4", label: "Portfolio Health" },
+    { id: "5", label: "Tech Sector Outlook" },
+  ];
 
   return (
     <div className="flex flex-col h-full">
@@ -166,9 +180,9 @@ function SidebarContent({
         <AnimatePresence>
           {!collapsed && (
             <motion.span
-              initial={{ opacity: 0, x: -6 }}
+              initial={{ opacity: 0, x: isRTL ? 6 : -6 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -6 }}
+              exit={{ opacity: 0, x: isRTL ? 6 : -6 }}
               transition={{ duration: 0.18 }}
               className="font-outfit font-bold text-[17px] text-primary dark:text-white whitespace-nowrap leading-none flex-1"
             >
@@ -185,11 +199,11 @@ function SidebarContent({
               "shrink-0 w-6 h-6 rounded-md flex items-center justify-center",
               "text-text-secondary-light dark:text-text-secondary-dark",
               "hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
-              collapsed && "ml-auto mr-0"
+              collapsed && (isRTL ? "mr-auto ml-0" : "ml-auto mr-0")
             )}
           >
             <motion.span animate={{ rotate: collapsed ? 0 : 180 }} transition={{ duration: 0.2 }}>
-              <ChevronRight size={14} />
+              <ChevronRight size={14} className={cn(isRTL && "rotate-180")} />
             </motion.span>
           </button>
         )}
@@ -198,9 +212,12 @@ function SidebarContent({
         {onClose && (
           <button
             onClick={onClose}
-            className="shrink-0 w-6 h-6 rounded-md flex items-center justify-center
-                       text-text-secondary-light dark:text-text-secondary-dark
-                       hover:bg-black/5 dark:hover:bg-white/5 transition-colors ml-auto"
+            className={cn(
+              "shrink-0 w-6 h-6 rounded-md flex items-center justify-center",
+              "text-text-secondary-light dark:text-text-secondary-dark",
+              "hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
+              isRTL ? "mr-auto" : "ml-auto"
+            )}
           >
             <X size={14} />
           </button>
@@ -209,7 +226,7 @@ function SidebarContent({
 
       {/* ── New chat ────────────────────────────────────────────────── */}
       <div className="px-2.5 pt-3 pb-2 shrink-0">
-        <Link href="/" onClick={onClose}>
+        <Link href="/dashboard" onClick={onClose} prefetch={true}>
           <div className={cn(
             "flex items-center gap-2 rounded-xl border cursor-pointer transition-all",
             "border-primary/15 dark:border-white/12",
@@ -227,7 +244,7 @@ function SidebarContent({
                   exit={{ opacity: 0 }}
                   className="font-inter font-semibold text-[13px] whitespace-nowrap"
                 >
-                  New Chat
+                  {dict.sidebar.newChat}
                 </motion.span>
               )}
             </AnimatePresence>
@@ -237,10 +254,10 @@ function SidebarContent({
 
       {/* ── Nav items ───────────────────────────────────────────────── */}
       <nav className="px-2.5 space-y-0.5 shrink-0">
-        {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+        {navItems.map(({ href, icon: Icon, label }) => {
           const active = pathname === href;
           return (
-            <Link key={href} href={href} onClick={onClose}>
+            <Link key={href} href={href} onClick={onClose} prefetch={true}>
               <div className={cn(
                 "relative flex items-center gap-2.5 rounded-xl cursor-pointer transition-colors",
                 collapsed ? "justify-center p-2.5" : "px-3 py-2.5",
@@ -257,7 +274,7 @@ function SidebarContent({
                       exit={{ opacity: 0 }}
                       className="flex items-center flex-1 gap-2 relative z-10"
                     >
-                      <span className="font-inter font-medium text-[13px] whitespace-nowrap flex-1">
+                      <span className="font-inter font-medium text-[13px] whitespace-nowrap flex-1 text-start">
                         {label}
                       </span>
                       {active && (
@@ -285,8 +302,8 @@ function SidebarContent({
             exit={{ opacity: 0 }}
             className="flex-1 overflow-y-auto px-2.5 pt-3 min-h-0"
           >
-            <HistorySection label="Today" chats={RECENT_CHATS} onClose={onClose} />
-            <HistorySection label="Previous 7 Days" chats={OLDER_CHATS} onClose={onClose} />
+            <HistorySection label={dict.sidebar.today} chats={recentChats} onClose={onClose} />
+            <HistorySection label={dict.sidebar.previous7Days} chats={olderChats} onClose={onClose} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -296,11 +313,16 @@ function SidebarContent({
       <div className="shrink-0 border-t border-border-light dark:border-[#1C1C28] p-2.5 relative">
         <AnimatePresence>
           {showUserPopover && (
-            <UserPopover collapsed={collapsed} onClose={() => setShowUserPopover(false)} />
+            <UserPopover 
+              collapsed={collapsed} 
+              onClose={() => setShowUserPopover(false)} 
+              triggerRef={triggerRef}
+            />
           )}
         </AnimatePresence>
 
         <button
+          ref={triggerRef}
           onClick={() => setShowUserPopover(!showUserPopover)}
           className={cn(
             "w-full flex items-center gap-2.5 rounded-xl transition-colors cursor-pointer",
@@ -317,7 +339,7 @@ function SidebarContent({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="flex-1 text-left min-w-0"
+                className="flex-1 text-start min-w-0"
               >
                 <p className="font-inter font-semibold text-[12px] text-text-primary-light dark:text-text-primary-dark truncate leading-tight">
                   Ahmed Abdelaty
@@ -333,7 +355,8 @@ function SidebarContent({
               size={13}
               className={cn(
                 "shrink-0 text-text-secondary-light/50 dark:text-text-secondary-dark/50 transition-transform",
-                showUserPopover && "rotate-90"
+                showUserPopover && (isRTL ? "-rotate-90" : "rotate-90"),
+                isRTL && !showUserPopover && "rotate-180"
               )}
             />
           )}
@@ -353,13 +376,13 @@ function HistorySection({
   onClose?: () => void;
 }) {
   return (
-    <div className="mb-2">
+    <div className="mb-2 text-start">
       <p className="px-3 pt-2 pb-1 font-inter font-bold text-[10px] tracking-[1.2px] uppercase
                     text-text-secondary-light/50 dark:text-text-secondary-dark/50">
         {label}
       </p>
       {chats.map((chat) => (
-        <Link key={chat.id} href="/" onClick={onClose}>
+        <Link key={chat.id} href="/dashboard" onClick={onClose} prefetch={true}>
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer
                           hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors">
             <MessageSquare size={13} className="shrink-0 text-text-secondary-light/35 dark:text-text-secondary-dark/35" />
@@ -379,6 +402,7 @@ import { useSidebar } from "./SidebarContext";
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { mobileOpen, setMobileOpen } = useSidebar();
+  const { isRTL } = useLanguage();
 
   return (
     <>
@@ -394,13 +418,14 @@ export function Sidebar() {
               className="lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
             />
             <motion.div
-              initial={{ x: -280 }}
+              initial={{ x: isRTL ? 280 : -280 }}
               animate={{ x: 0 }}
-              exit={{ x: -280 }}
+              exit={{ x: isRTL ? 280 : -280 }}
               transition={{ type: "spring", stiffness: 340, damping: 32 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-[272px]
-                         bg-card-light dark:bg-card-dark
-                         border-r border-border-light dark:border-[#1C1C28]"
+              className={cn(
+                "lg:hidden fixed top-0 bottom-0 z-50 w-[272px] bg-card-light dark:bg-card-dark border-border-light dark:border-[#1C1C28]",
+                isRTL ? "right-0 border-l" : "left-0 border-r"
+              )}
             >
               <SidebarContent
                 collapsed={false}
@@ -416,10 +441,10 @@ export function Sidebar() {
         initial={false}
         animate={{ width: collapsed ? 60 : 260 }}
         transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-        className="hidden lg:flex flex-col h-screen
-                   bg-card-light dark:bg-card-dark
-                   border-r border-border-light dark:border-[#1C1C28]
-                   relative z-30 overflow-hidden select-none shrink-0"
+        className={cn(
+          "hidden lg:flex flex-col h-screen bg-card-light dark:bg-card-dark border-border-light dark:border-[#1C1C28] relative z-30 overflow-hidden select-none shrink-0",
+          isRTL ? "border-l" : "border-r"
+        )}
       >
         <SidebarContent
           collapsed={collapsed}

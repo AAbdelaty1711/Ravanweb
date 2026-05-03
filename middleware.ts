@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // ─── Route groups ─────────────────────────────────────────────────────────────
-const PUBLIC_PATHS = ["/login", "/register", "/forgot-password", "/verify", "/reset-password"];
+const PUBLIC_PATHS = ["/", "/login", "/register", "/forgot-password", "/verify", "/reset-password"];
 
 /**
  * Auth guard middleware.
