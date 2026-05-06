@@ -2,17 +2,9 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  ArrowUp,
-  Sparkles,
-  TrendingUp,
-  BarChart2,
-  Zap,
-  Menu,
-} from 'lucide-react'
+import { ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { RavenMark } from '@/components/ui/RavenMark'
-import { useSidebar } from '@/components/SidebarContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -69,10 +61,10 @@ function AIBubble({ text }: { text: string }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      className="flex items-start gap-3 max-w-[85%]"
+      className="flex items-start gap-3 max-w-[95%]"
     >
-      <div className="shrink-0 w-9 h-9 mt-0.5 rounded-full bg-primary/10 dark:bg-white/10 flex items-center justify-center">
-        <RavenMark size={18} className="text-primary dark:text-white" />
+      <div className="shrink-0 w-8 h-8 mt-0.5 rounded-full bg-primary/10 dark:bg-white/10 flex items-center justify-center">
+        <RavenMark size={16} className="text-primary dark:text-white" />
       </div>
       <div className="flex-1 pt-1 overflow-hidden">
         <ReactMarkdown
@@ -107,32 +99,32 @@ function AIBubble({ text }: { text: string }) {
               </pre>
             ),
             ul: ({ children }) => (
-              <ul className="mb-3 ps-4 space-y-1 list-disc list-outside text-text-primary-light dark:text-text-primary-dark">
+              <ul className="mb-3 ps-4 space-y-1 list-disc list-outside text-text-primary-light dark:text-text-primary-dark text-[13px]">
                 {children}
               </ul>
             ),
             ol: ({ children }) => (
-              <ol className="mb-3 ps-4 space-y-1 list-decimal list-outside text-text-primary-light dark:text-text-primary-dark">
+              <ol className="mb-3 ps-4 space-y-1 list-decimal list-outside text-text-primary-light dark:text-text-primary-dark text-[13px]">
                 {children}
               </ol>
             ),
             li: ({ children }) => (
-              <li className="font-inter text-[13px] leading-relaxed">
+              <li className="font-inter leading-relaxed">
                 {children}
               </li>
             ),
             h1: ({ children }) => (
-              <h1 className="font-outfit font-bold text-[17px] text-primary dark:text-white mb-3 leading-snug">
+              <h1 className="font-outfit font-bold text-[16px] text-primary dark:text-white mb-2 leading-snug">
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
-              <h2 className="font-outfit font-bold text-[15px] text-primary dark:text-white mb-2 mt-4 leading-snug">
+              <h2 className="font-outfit font-bold text-[14px] text-primary dark:text-white mb-2 mt-3 leading-snug">
                 {children}
               </h2>
             ),
             h3: ({ children }) => (
-              <h3 className="font-outfit font-semibold text-[13px] text-primary dark:text-white mb-2 mt-3 leading-snug">
+              <h3 className="font-outfit font-semibold text-[13px] text-primary dark:text-white mb-2 mt-2 leading-snug">
                 {children}
               </h3>
             ),
@@ -141,13 +133,13 @@ function AIBubble({ text }: { text: string }) {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary dark:text-blue-400 underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-all"
+                className="text-primary dark:text-blue-400 underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-all text-[13px]"
               >
                 {children}
               </a>
             ),
             blockquote: ({ children }) => (
-              <blockquote className="border-s-2 border-primary/30 dark:border-white/20 ps-3 py-0.5 my-3 text-text-secondary-light dark:text-text-secondary-dark">
+              <blockquote className="border-s-2 border-primary/30 dark:border-white/20 ps-3 py-0.5 my-3 text-[13px] text-text-secondary-light dark:text-text-secondary-dark">
                 {children}
               </blockquote>
             ),
@@ -164,17 +156,17 @@ function AIBubble({ text }: { text: string }) {
               </thead>
             ),
             th: ({ children }) => (
-              <th className="px-4 py-2 border-b border-black/5 dark:border-white/5 text-text-primary-light dark:text-text-primary-dark text-start">
+              <th className="px-3 py-2 border-b border-black/5 dark:border-white/5 text-text-primary-light dark:text-text-primary-dark text-start">
                 {children}
               </th>
             ),
             td: ({ children }) => (
-              <td className="px-4 py-2 border-b border-black/5 dark:border-white/5 text-text-primary-light dark:text-text-primary-dark">
+              <td className="px-3 py-2 border-b border-black/5 dark:border-white/5 text-text-primary-light dark:text-text-primary-dark">
                 {children}
               </td>
             ),
             hr: () => (
-              <hr className="my-4 border-black/5 dark:border-white/5" />
+              <hr className="my-3 border-black/5 dark:border-white/5" />
             ),
           }}
         >
@@ -195,9 +187,9 @@ function UserBubble({ text }: { text: string }) {
     >
       <div
         className={cn(
-          'max-w-[75%] px-4 py-3 rounded-[22px] rounded-br-[5px]',
+          'max-w-[85%] px-3 py-2.5 rounded-[18px] rounded-br-[4px]',
           'bg-gray-100 dark:bg-[#2F2F2F]',
-          'font-inter text-[13px] text-black dark:text-white leading-[1.5]',
+          'font-inter text-[13px] text-black dark:text-white leading-[1.4]',
           'shadow-sm'
         )}
       >
@@ -219,9 +211,9 @@ function EmptyState({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex flex-col items-center justify-center h-full px-4 pb-8"
+      className="flex flex-col items-center justify-center h-full px-4 pb-4"
     >
-      <div className="relative mb-8 flex items-center justify-center">
+      <div className="relative mb-6 flex items-center justify-center">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -229,10 +221,10 @@ function EmptyState({
           className="relative z-10 flex items-center justify-center"
         >
           <motion.div
-            animate={{ scale: [1, 1.08, 1], opacity: [0.8, 1, 0.8] }}
+            animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <RavenMark size={180} className="text-primary dark:text-white" />
+            <RavenMark size={80} className="text-primary dark:text-white" />
           </motion.div>
         </motion.div>
       </div>
@@ -242,10 +234,10 @@ function EmptyState({
         transition={{ delay: 0.2, duration: 0.5 }}
         className="text-center"
       >
-        <h2 className="font-outfit font-bold text-[17px] sm:text-[20px] whitespace-nowrap text-primary dark:text-white mb-2 leading-snug">
+        <h2 className="font-outfit font-bold text-[15px] sm:text-[16px] whitespace-nowrap text-primary dark:text-white mb-1 leading-snug">
           {dict.chat.greeting}
         </h2>
-        <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark">
+        <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark px-2">
           {dict.chat.greetingDesc}
         </p>
       </motion.div>
@@ -270,24 +262,24 @@ function ChatInput({
 
   useEffect(() => {
     if (ref.current && value === '') {
-      ref.current.style.height = '28px'
+      ref.current.style.height = '30px'
     }
   }, [value])
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value)
-    e.target.style.height = '28px'
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`
+    e.target.style.height = '30px'
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`
   }
 
   return (
-    <div className="px-4 pb-2">
+    <div className="px-3 pb-2 pt-1 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1a202c]">
       <div
         className={cn(
-          'flex items-end gap-2 px-4 py-3',
-          'bg-black/[0.04] dark:bg-white/[0.05]',
-          'rounded-[30px] border border-gray-200 dark:border-gray-700/50',
-          'transition-all duration-200',
+          'flex items-end gap-2 px-3 py-2',
+          'bg-white dark:bg-[#0b0e14]',
+          'rounded-[24px] border border-gray-200 dark:border-gray-700/50',
+          'transition-all duration-200 mt-2',
           'focus-within:border-primary/50 dark:focus-within:border-white/20',
           'shadow-sm',
           isRTL && 'flex-row-reverse'
@@ -303,14 +295,14 @@ function ChatInput({
               if (hasText && !disabled) onSend()
             }
           }}
-          placeholder={dict.chat.placeholder}
+          placeholder="Ask Raven AI to draw or analyze..."
           rows={1}
           dir="auto"
           className={cn(
             'flex-1 resize-none bg-transparent outline-none',
-            'font-inter text-[12px] text-text-primary-light dark:text-text-primary-dark',
-            'placeholder:text-text-secondary-light/60 dark:placeholder:text-text-secondary-dark/60',
-            'py-1.5 leading-snug min-h-[28px] max-h-[120px]',
+            'font-inter text-[13px] text-gray-900 dark:text-white',
+            'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+            'py-1.5 leading-snug min-h-[30px] max-h-[100px]',
             isRTL ? 'text-end' : 'text-start'
           )}
         />
@@ -325,26 +317,21 @@ function ChatInput({
               disabled={disabled}
               className={cn(
                 'shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
-                'bg-primary dark:bg-white text-white dark:text-black',
-                'transition-opacity',
+                'bg-primary hover:bg-primary/90 text-white dark:bg-white dark:text-primary dark:hover:bg-gray-100',
+                'transition-colors',
                 disabled && 'opacity-50'
               )}
             >
-              <ArrowUp size={14} />
+              <ArrowUp size={16} />
             </motion.button>
           )}
         </AnimatePresence>
       </div>
-      <p className="text-center font-inter text-[10px] text-text-secondary-light/40 dark:text-text-secondary-dark/40 mt-2">
-        {dict.chat.disclaimer}
-      </p>
     </div>
   )
 }
 
-export default function ChatPage() {
-  const { setMobileOpen } = useSidebar()
-  const { dict, isRTL } = useLanguage()
+export default function AIChatPanel() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [thinking, setThinking] = useState(false)
@@ -383,61 +370,8 @@ export default function ChatPage() {
   )
 
   return (
-    <div className="flex flex-col h-full market-pattern">
-      {/* Mobile header */}
-      <div
-        className={cn(
-          'flex items-center justify-center h-14 border-b border-border-light dark:border-[#141414]',
-          'bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md lg:hidden px-4 shrink-0 relative'
-        )}
-      >
-        <button
-          onClick={() => setMobileOpen(true)}
-          className={cn(
-            'absolute w-10 h-10 flex items-center justify-center text-primary dark:text-white',
-            isRTL ? 'right-4' : 'left-4'
-          )}
-        >
-          <Menu size={18} />
-        </button>
-        <div className="flex items-center gap-2">
-          <RavenMark size={18} className="text-primary dark:text-white" />
-          <span className="font-outfit font-bold text-[17px] text-primary dark:text-white">
-            Raven AI
-          </span>
-        </div>
-      </div>
-
-      {/* Desktop header */}
-      <div
-        className={cn(
-          'hidden lg:flex items-center justify-between px-6 py-4 border-b border-border-light dark:border-[#141414] shrink-0',
-          isRTL && 'flex-row-reverse'
-        )}
-      >
-        <div className={isRTL ? 'text-end' : 'text-start'}>
-          <h1 className="font-outfit font-bold text-[20px] text-primary dark:text-white">
-            {dict.chat.title}
-          </h1>
-          <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
-            {dict.chat.subtitle}
-          </p>
-        </div>
-        <div
-          className={cn(
-            'flex items-center gap-2 px-3 py-1.5 rounded-full bg-bull/10 border border-bull/20',
-            isRTL && 'flex-row-reverse'
-          )}
-        >
-          <div className="w-1.5 h-1.5 rounded-full bg-bull animate-pulse" />
-          <span className="font-inter font-semibold text-[11px] text-bull">
-            {dict.chat.marketsOpen}
-          </span>
-        </div>
-      </div>
-
-      {/* Message area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-0">
+    <div className="flex flex-col h-full bg-white dark:bg-[#131722] font-inter">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-0 custom-scrollbar">
         <AnimatePresence mode="wait">
           {messages.length === 0 && !thinking ? (
             <EmptyState onPromptClick={handleSend} />
@@ -446,7 +380,7 @@ export default function ChatPage() {
               key="chat"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="space-y-5 pb-2"
+              className="space-y-4 pb-2"
             >
               {messages.map((msg) =>
                 msg.isUser ? (
@@ -456,14 +390,14 @@ export default function ChatPage() {
                 )
               )}
               {thinking && (
-                <motion.div
+               <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-3"
+                  className="flex items-center gap-2"
                 >
-                  <div className="shrink-0 w-9 h-9 rounded-full bg-primary/10 dark:bg-white/10 flex items-center justify-center">
+                  <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 dark:bg-white/10 flex items-center justify-center">
                     <RavenMark
-                      size={18}
+                      size={16}
                       className="text-primary dark:text-white"
                     />
                   </div>
@@ -476,8 +410,7 @@ export default function ChatPage() {
         </AnimatePresence>
       </div>
 
-      {/* Chat input */}
-      <div className="shrink-0 pt-2">
+      <div className="shrink-0">
         <ChatInput
           value={input}
           onChange={setInput}

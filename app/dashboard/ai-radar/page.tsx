@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { TagPill } from '@/components/ui/TagPill'
+
 import {
   History,
   Bell,
@@ -17,6 +18,7 @@ import {
   Filter,
   Clock,
   Activity,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSidebar } from '@/components/SidebarContext'
@@ -38,7 +40,7 @@ const ACTION_CONFIG: Record<
   }
 > = {
   buy: {
-    label: 'BUY',
+    label: 'Bullish',
     color: 'text-green-600 dark:text-green-400',
     bg: 'bg-green-50 dark:bg-green-500/10',
     border: 'border-green-200 dark:border-green-500/25',
@@ -46,7 +48,7 @@ const ACTION_CONFIG: Record<
     badge: 'bg-green-500',
   },
   watch: {
-    label: 'WATCH',
+    label: 'On Radar',
     color: 'text-slate-500 dark:text-slate-400',
     bg: 'bg-slate-50 dark:bg-slate-400/10',
     border: 'border-slate-200 dark:border-slate-400/20',
@@ -54,7 +56,7 @@ const ACTION_CONFIG: Record<
     badge: 'bg-slate-400',
   },
   avoid: {
-    label: 'AVOID',
+    label: 'Bearish',
     color: 'text-red-600 dark:text-red-400',
     bg: 'bg-red-50 dark:bg-red-500/10',
     border: 'border-red-200 dark:border-red-500/25',
@@ -124,7 +126,7 @@ function DesktopRadarCard({
       {/* Top color strip */}
       <div className={cn('h-[3px] w-full', cfg.strip)} />
 
-      <div className="p-4">
+      <div className="p-3">
         {/* Header row */}
         <div className="flex items-start gap-3 mb-3">
           {/* Logo */}
@@ -143,7 +145,7 @@ function DesktopRadarCard({
           {/* Ticker / name / badges */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-0.5">
-              <span className="font-outfit font-bold text-[15px] text-text-primary-light dark:text-text-primary-dark">
+              <span className="font-outfit font-bold text-[14px] text-text-primary-light dark:text-text-primary-dark">
                 {anomaly.ticker}
               </span>
               <span
@@ -157,7 +159,7 @@ function DesktopRadarCard({
                 {cfg.label}
               </span>
             </div>
-            <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark truncate">
+            <p className="font-inter text-[10px] text-text-secondary-light dark:text-text-secondary-dark truncate">
               {anomaly.name}
             </p>
           </div>
@@ -170,16 +172,16 @@ function DesktopRadarCard({
                 className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
               >
                 {bellActive ? (
-                  <BellRing size={14} className="text-amber-500" />
+                  <BellRing size={12} className="text-amber-500" />
                 ) : (
                   <Bell
-                    size={14}
+                    size={12}
                     className="text-text-secondary-light/35 dark:text-text-secondary-dark/35"
                   />
                 )}
               </button>
             )}
-            <span className="font-inter text-[10px] text-text-secondary-light/55 dark:text-text-secondary-dark/55">
+            <span className="font-inter text-[9px] text-text-secondary-light/55 dark:text-text-secondary-dark/55">
               {anomaly.timeAgo.replace('Closed', '').replace('ago', '').trim()}
             </span>
           </div>
@@ -191,7 +193,7 @@ function DesktopRadarCard({
             <p className="font-inter text-[9px] text-text-secondary-light/55 dark:text-text-secondary-dark/55 font-bold uppercase tracking-wide mb-0.5">
               {dict.radar.entry}
             </p>
-            <p className="font-inter font-bold text-[13px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
+            <p className="font-inter font-bold text-[12px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
               ${anomaly.entryPrice.toFixed(2)}
             </p>
           </div>
@@ -201,7 +203,7 @@ function DesktopRadarCard({
             </p>
             <p
               className={cn(
-                'font-inter font-bold text-[13px] tabular-nums',
+                'font-inter font-bold text-[12px] tabular-nums',
                 returnPositive
                   ? 'text-green-600 dark:text-green-400'
                   : 'text-red-600 dark:text-red-400'
@@ -212,12 +214,7 @@ function DesktopRadarCard({
           </div>
         </div>
 
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {anomaly.tags.map((tag) => (
-            <TagPill key={tag} label={tag} />
-          ))}
-        </div>
+
 
         {/* Ask AI button */}
         <button
@@ -230,11 +227,11 @@ function DesktopRadarCard({
                      bg-primary/[0.07] dark:bg-white/[0.07]
                      border border-primary/20 dark:border-white/20
                      text-primary dark:text-white
-                     font-inter font-bold text-[11px]
+                     font-inter font-bold text-[10px]
                      transition-all hover:bg-primary/12 dark:hover:bg-white/12
                      group-hover:border-primary/30 dark:group-hover:border-white/30"
         >
-          <Sparkles size={12} />
+          <Sparkles size={10} />
           {dict.watchlist.askAi}
         </button>
       </div>
@@ -242,7 +239,139 @@ function DesktopRadarCard({
   )
 }
 
-// ─── DESKTOP layout ───────────────────────────────────────────────────────────
+function FilterPopover({
+  showingHistory,
+  activeFilters,
+  currentFilter,
+  setCurrentFilter,
+  timeFilters,
+  timeFilter,
+  setTimeFilter,
+  onClose,
+  filtered,
+}: {
+  showingHistory: boolean
+  activeFilters: { key: string; label: string }[]
+  currentFilter: string
+  setCurrentFilter: (v: string) => void
+  timeFilters: { key: string; label: string }[]
+  timeFilter: string
+  setTimeFilter: (v: string) => void
+  onClose: () => void
+  filtered: RadarAnomaly[]
+}) {
+  const { dict } = useLanguage()
+  const ref = useRef<HTMLDivElement>(null)
+
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted || typeof document === 'undefined') return null
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[4px]"
+      />
+
+      {/* Modal Content */}
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        className={cn(
+          'relative w-full max-w-[320px] p-6 rounded-[24px] shadow-2xl border',
+          'bg-white dark:bg-[#1A1A24]',
+          'border-gray-200 dark:border-white/10'
+        )}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="font-outfit font-bold text-[18px] text-primary dark:text-white">
+            {dict.radar.filter || 'Filters'}
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+          >
+            <X size={16} className="text-text-secondary-light/50" />
+          </button>
+        </div>
+
+        <div className="space-y-5">
+          {/* Status Filters */}
+          <div className="text-start">
+            <p className="font-inter text-[9px] font-bold text-text-secondary-light/40 dark:text-text-secondary-dark/40 uppercase tracking-widest mb-3 px-1">
+              {showingHistory ? 'History Period' : 'Signal Status'}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {activeFilters.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setCurrentFilter(key)
+                  }}
+                  className={cn(
+                    'px-4 py-2 rounded-xl text-[11px] font-inter font-semibold border transition-all',
+                    currentFilter === key
+                      ? 'bg-primary/10 dark:bg-white/12 border-primary/25 dark:border-white/20 text-primary dark:text-white'
+                      : 'bg-gray-50 dark:bg-white/[0.04] border-gray-100 dark:border-white/[0.06] text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-white/[0.08]'
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Time Filters */}
+          {!showingHistory && (
+            <div className="pt-4 border-t border-gray-100 dark:border-white/[0.06] text-start">
+              <p className="font-inter text-[9px] font-bold text-text-secondary-light/40 dark:text-text-secondary-dark/40 uppercase tracking-widest mb-3 px-1">
+                Time Range
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {timeFilters.map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setTimeFilter(key)
+                    }}
+                    className={cn(
+                      'px-4 py-2 rounded-xl text-[11px] font-inter font-semibold border transition-all',
+                      timeFilter === key
+                        ? 'bg-primary/10 dark:bg-white/12 border-primary/25 dark:border-white/20 text-primary dark:text-white'
+                        : 'bg-gray-50 dark:bg-white/[0.04] border-gray-100 dark:border-white/[0.06] text-text-secondary-light/70 dark:text-text-secondary-dark/70 hover:bg-gray-100 dark:hover:bg-white/[0.08]'
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={onClose}
+            className="w-full mt-2 py-3 rounded-2xl bg-primary dark:bg-white text-white dark:text-primary font-inter font-bold text-[12px] hover:opacity-90 transition-opacity"
+          >
+            Show {filtered.length} Results
+          </button>
+        </div>
+      </motion.div>
+    </div>,
+    document.body
+  )
+}
+
 function DesktopAiRadar({ state }: { state: RadarPageState }) {
   const { dict, isRTL } = useLanguage()
   const {
@@ -259,6 +388,9 @@ function DesktopAiRadar({ state }: { state: RadarPageState }) {
     filtered,
     router,
   } = state
+
+  const [showFilters, setShowFilters] = useState(false)
+  const filterBtnRef = useRef<HTMLButtonElement>(null)
 
   const activeFilters = showingHistory
     ? [
@@ -295,7 +427,7 @@ function DesktopAiRadar({ state }: { state: RadarPageState }) {
     <div className="hidden lg:flex flex-col h-full market-pattern">
       {/* ── Desktop header ─────────────────────────────────────────── */}
       <div className="px-6 pt-5 pb-4 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
-        <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <div className="flex items-center gap-2.5 mb-1">
               <h1 className="font-outfit font-bold text-[24px] text-primary dark:text-white tracking-tight leading-none">
@@ -308,86 +440,69 @@ function DesktopAiRadar({ state }: { state: RadarPageState }) {
                 )}
               >
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span className="font-inter font-semibold text-[10px] text-green-600 dark:text-green-400">
+                <span className="font-inter font-semibold text-[9px] text-green-600 dark:text-green-400">
                   {dict.radar.live}
                 </span>
               </div>
             </div>
-            <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark">
-              {filtered.length} {dict.radar.subtitle}
+            <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark">
+              {dict.radar.subtitle}
             </p>
           </div>
 
-          <button
-            onClick={() => setShowingHistory(!showingHistory)}
-            className={cn(
-              'flex items-center gap-1.5 px-4 py-2 rounded-xl border font-inter font-semibold text-[12px] transition-all shrink-0',
-              isRTL && 'flex-row-reverse',
-              showingHistory
-                ? 'bg-primary/10 dark:bg-white/10 border-primary/25 dark:border-white/20 text-primary dark:text-white'
-                : 'bg-white dark:bg-white/[0.04] border-gray-200 dark:border-white/10 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-white/[0.07]'
-            )}
-          >
-            <History size={14} />{' '}
-            {showingHistory ? dict.radar.liveSignals : dict.radar.history}
-          </button>
-        </div>
+          <div className="flex items-center gap-2 relative">
+            <button
+              ref={filterBtnRef}
+              onClick={() => setShowFilters(!showFilters)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-inter font-semibold text-[10px] transition-all shrink-0',
+                isRTL && 'flex-row-reverse',
+                showFilters
+                  ? 'bg-primary/10 dark:bg-white/10 border-primary/25 dark:border-white/20 text-primary dark:text-white'
+                  : 'bg-white dark:bg-white/[0.04] border-gray-200 dark:border-white/10 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-white/[0.07]'
+              )}
+            >
+              <Filter size={11} />
+              {dict.radar.filter || 'Filter'}
+            </button>
 
-        {/* Filter chips */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <Filter
-              size={12}
-              className="text-text-secondary-light/50 dark:text-text-secondary-dark/50"
-            />
-            {activeFilters.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setCurrentFilter(key)}
-                className={cn(
-                  'px-3 py-1 rounded-xl text-[12px] font-inter font-semibold border transition-all',
-                  currentFilter === key
-                    ? 'bg-primary/10 dark:bg-white/12 border-primary/25 dark:border-white/20 text-primary dark:text-white'
-                    : 'bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/[0.07] text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-white/[0.07]'
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {!showingHistory && (
-            <>
-              <div className="w-px h-4 bg-gray-200 dark:bg-white/10" />
-              <div className="flex items-center gap-1.5">
-                <Clock
-                  size={12}
-                  className="text-text-secondary-light/50 dark:text-text-secondary-dark/50"
+            <AnimatePresence>
+              {showFilters && (
+                <FilterPopover
+                  showingHistory={showingHistory}
+                  activeFilters={activeFilters}
+                  currentFilter={currentFilter}
+                  setCurrentFilter={setCurrentFilter}
+                  timeFilters={timeFilters}
+                  timeFilter={timeFilter}
+                  setTimeFilter={setTimeFilter}
+                  onClose={() => setShowFilters(false)}
+                  filtered={filtered}
                 />
-                {timeFilters.map(({ key, label }) => (
-                  <button
-                    key={key}
-                    onClick={() => setTimeFilter(key)}
-                    className={cn(
-                      'px-3 py-1 rounded-xl text-[11px] font-inter font-semibold border transition-all',
-                      timeFilter === key
-                        ? 'bg-primary/10 dark:bg-white/12 border-primary/25 dark:border-white/20 text-primary dark:text-white'
-                        : 'bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/[0.07] text-text-secondary-light/70 dark:text-text-secondary-dark/70 hover:bg-gray-50 dark:hover:bg-white/[0.07]'
-                    )}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+              )}
+            </AnimatePresence>
+
+            <button
+              onClick={() => setShowingHistory(!showingHistory)}
+              className={cn(
+                'flex items-center gap-1.5 px-4 py-2 rounded-xl border font-inter font-semibold text-[11px] transition-all shrink-0',
+                isRTL && 'flex-row-reverse',
+                showingHistory
+                  ? 'bg-primary/10 dark:bg-white/10 border-primary/25 dark:border-white/20 text-primary dark:text-white'
+                  : 'bg-white dark:bg-white/[0.04] border-gray-200 dark:border-white/10 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-white/[0.07]'
+              )}
+            >
+              <History size={12} />{' '}
+              {showingHistory ? dict.radar.liveSignals : dict.radar.history}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* ── Grid ─────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-6 py-5 min-h-0">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
+          <div className="flex flex-col items-center justify-center h-64 gap-3">
             <div className="w-14 h-14 rounded-2xl bg-primary/[0.07] dark:bg-white/[0.07] flex items-center justify-center">
               <Zap size={26} className="text-primary/30 dark:text-white/30" />
             </div>
@@ -395,13 +510,13 @@ function DesktopAiRadar({ state }: { state: RadarPageState }) {
               <h3 className="font-outfit font-bold text-[18px] text-text-primary-light dark:text-text-primary-dark">
                 {dict.radar.noSignals}
               </h3>
-              <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-1">
+              <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-1">
                 {dict.radar.noSignalsDesc}
               </p>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
             <AnimatePresence mode="popLayout">
               {filtered.map((anomaly) => (
                 <DesktopRadarCard
@@ -473,7 +588,7 @@ function MobileExpandableCard({
                 el.style.display = 'none'
                 const parent = el.parentElement
                 if (parent) {
-                  parent.innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="font-outfit font-bold text-[11px]" style="color:${anomaly.action === 'buy' ? '#22c55e' : anomaly.action === 'avoid' ? '#ef4444' : '#64748b'}">${anomaly.ticker[0]}</span></div>`
+                  parent.innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="font-outfit font-bold text-[10px]" style="color:${anomaly.action === 'buy' ? '#22c55e' : anomaly.action === 'avoid' ? '#ef4444' : '#64748b'}">${anomaly.ticker[0]}</span></div>`
                 }
               }}
             />
@@ -482,7 +597,7 @@ function MobileExpandableCard({
           {/* Names */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="font-outfit font-bold text-[12px] text-text-primary-light dark:text-text-primary-dark tracking-[-0.2px]">
+              <span className="font-outfit font-bold text-[11px] text-text-primary-light dark:text-text-primary-dark tracking-[-0.2px]">
                 {anomaly.ticker}
               </span>
               <span
@@ -496,7 +611,7 @@ function MobileExpandableCard({
                 {cfg.label}
               </span>
             </div>
-            <p className="font-inter text-[10px] text-text-secondary-light dark:text-text-secondary-dark truncate leading-tight mt-0.5">
+            <p className="font-inter text-[9px] text-text-secondary-light dark:text-text-secondary-dark truncate leading-tight mt-0.5">
               {anomaly.name}
             </p>
           </div>
@@ -583,12 +698,7 @@ function MobileExpandableCard({
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               className="overflow-hidden"
             >
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1.5 mt-2.5">
-                {anomaly.tags.map((tag) => (
-                  <TagPill key={tag} label={tag} />
-                ))}
-              </div>
+
 
               {/* Ask Raven AI button — full width */}
               <button
@@ -605,7 +715,7 @@ function MobileExpandableCard({
                            font-inter font-bold text-[10.5px]
                            transition-colors hover:bg-primary/12 dark:hover:bg-white/12"
               >
-                <Sparkles size={13} />
+                <Sparkles size={11} />
                 {dict.watchlist.askAi}
               </button>
             </motion.div>
@@ -660,6 +770,9 @@ function MobileAiRadar({ state }: { state: RadarPageState }) {
     router,
   } = state
 
+  const [showFilters, setShowFilters] = useState(false)
+  const filterBtnRef = useRef<HTMLButtonElement>(null)
+
   const activeFilters = showingHistory
     ? [
         { key: '7 Days', label: dict.radar['7Days'] },
@@ -692,64 +805,66 @@ function MobileAiRadar({ state }: { state: RadarPageState }) {
             className="w-8 h-8 rounded-full flex items-center justify-center
                        bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 shrink-0"
           >
-            <Menu size={14} className="text-primary dark:text-white" />
+            <Menu size={12} className="text-primary dark:text-white" />
           </button>
 
           {/* Title */}
-          <h1 className="flex-1 font-outfit font-bold text-[15px] text-primary dark:text-white tracking-[-0.4px] leading-tight">
+          <h1 className="flex-1 font-outfit font-bold text-[14px] text-primary dark:text-white tracking-[-0.4px] leading-tight">
             Raven Radar
-            <span className="block font-inter text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark tracking-normal">
+            <span className="block font-inter text-[9px] font-medium text-text-secondary-light dark:text-text-secondary-dark tracking-normal">
               AI Radar
             </span>
           </h1>
 
-          {/* History toggle */}
-          <button
-            onClick={() => setShowingHistory(!showingHistory)}
-            className={cn(
-              'flex items-center gap-1 px-2 py-1 rounded-[8px] border transition-all',
-              showingHistory
-                ? 'bg-primary/12 dark:bg-white/12 border-primary/30 dark:border-white/30 text-primary dark:text-white'
-                : 'bg-white dark:bg-white/[0.06] border-gray-200 dark:border-white/10 text-text-secondary-light dark:text-text-secondary-dark'
-            )}
-          >
-            <History size={12} />
-            <span className="font-inter font-semibold text-[10px]">
-              {showingHistory ? dict.radar.history : dict.radar.liveSignals}
-            </span>
-          </button>
-        </div>
+          {/* Action buttons */}
+          <div className="flex items-center gap-1.5 relative">
+            <button
+              ref={filterBtnRef}
+              onClick={() => setShowFilters(!showFilters)}
+              className={cn(
+                'flex items-center gap-1 px-2 py-1 rounded-[8px] border transition-all',
+                showFilters
+                  ? 'bg-primary/12 dark:bg-white/12 border-primary/30 dark:border-white/30 text-primary dark:text-white'
+                  : 'bg-white dark:bg-white/[0.06] border-gray-200 dark:border-white/10 text-text-secondary-light dark:text-text-secondary-dark'
+              )}
+            >
+              <Filter size={11} />
+              <span className="font-inter font-semibold text-[9px]">
+                {dict.radar.filter || 'Filter'}
+              </span>
+            </button>
 
-        {/* Filter chips row */}
-        <div className="flex items-center gap-0 px-4 pt-2.5 pb-1.5">
-          <div className="flex-1 overflow-x-auto no-scrollbar">
-            <div className="flex items-center gap-2">
-              {activeFilters.map(({ key, label }) => (
-                <MobileFilterChip
-                  key={key}
-                  label={label}
-                  isSelected={currentFilter === key}
-                  onTap={() => setCurrentFilter(key)}
+            <AnimatePresence>
+              {showFilters && (
+                <FilterPopover
+                  showingHistory={showingHistory}
+                  activeFilters={activeFilters}
+                  currentFilter={currentFilter}
+                  setCurrentFilter={setCurrentFilter}
+                  timeFilters={timeFilters}
+                  timeFilter={timeFilter}
+                  setTimeFilter={setTimeFilter}
+                  onClose={() => setShowFilters(false)}
+                  filtered={filtered}
                 />
-              ))}
-            </div>
-          </div>
+              )}
+            </AnimatePresence>
 
-          {/* Time filter (radar only) — Flutter "Filter" button */}
-          {!showingHistory && (
-            <div className="flex items-center gap-1.5 pl-2 ml-2 border-l border-gray-200 dark:border-white/12 shrink-0">
-              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
-                {timeFilters.map(({ key, label }) => (
-                  <MobileFilterChip
-                    key={key}
-                    label={label}
-                    isSelected={timeFilter === key}
-                    onTap={() => setTimeFilter(key)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+            <button
+              onClick={() => setShowingHistory(!showingHistory)}
+              className={cn(
+                'flex items-center gap-1 px-2 py-1 rounded-[8px] border transition-all',
+                showingHistory
+                  ? 'bg-primary/12 dark:bg-white/12 border-primary/30 dark:border-white/30 text-primary dark:text-white'
+                  : 'bg-white dark:bg-white/[0.06] border-gray-200 dark:border-white/10 text-text-secondary-light dark:text-text-secondary-dark'
+              )}
+            >
+              <History size={10} />
+              <span className="font-inter font-semibold text-[9px]">
+                {showingHistory ? dict.radar.history : dict.radar.liveSignals}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -757,7 +872,7 @@ function MobileAiRadar({ state }: { state: RadarPageState }) {
       <div className="flex-1 overflow-y-auto px-4 pt-1 pb-8 min-h-0">
         {filtered.length === 0 ? (
           <div className="flex items-center justify-center h-48">
-            <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark">
+            <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark">
               {dict.radar.noSignals}
             </p>
           </div>

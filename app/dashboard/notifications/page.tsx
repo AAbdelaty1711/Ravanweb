@@ -89,7 +89,7 @@ function DesktopNotifRow({
       transition={{ duration: 0.18 }}
       onClick={onTap}
       className={cn(
-        'flex items-start gap-4 px-5 py-4 cursor-pointer transition-all duration-150 rounded-2xl border',
+        'flex items-start gap-3 px-4 py-3 cursor-pointer transition-all duration-150 rounded-2xl border',
         isUnread
           ? 'bg-primary/[0.03] dark:bg-primary/10 border-primary/20 dark:border-primary/30 shadow-sm hover:bg-primary/[0.05] dark:hover:bg-primary/15'
           : 'bg-white/40 dark:bg-white/[0.02] border-gray-100 dark:border-white/[0.05] opacity-80 hover:opacity-100'
@@ -129,7 +129,7 @@ function DesktopNotifRow({
           )}
           <span
             className={cn(
-              'font-inter text-[11px] text-text-secondary-light/60 dark:text-text-secondary-dark/60 shrink-0',
+              'font-inter text-[10px] text-text-secondary-light/60 dark:text-text-secondary-dark/60 shrink-0',
               isRTL ? 'mr-auto' : 'ml-auto'
             )}
           >
@@ -138,7 +138,7 @@ function DesktopNotifRow({
         </div>
         <p
           className={cn(
-            'font-inter text-[14.5px] leading-snug text-start',
+            'font-inter text-[13.5px] leading-snug text-start',
             isUnread
               ? 'font-bold text-text-primary-light dark:text-text-primary-dark'
               : 'font-medium text-text-secondary-light/90 dark:text-text-secondary-dark/80'
@@ -146,7 +146,7 @@ function DesktopNotifRow({
         >
           {notif.title}
         </p>
-        <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-1 leading-relaxed text-start">
+        <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-1 leading-relaxed text-start">
           {notif.body}
         </p>
       </div>
@@ -180,17 +180,17 @@ function DesktopNotifications({ state }: { state: NotifPageState }) {
     <div className="hidden lg:flex flex-col h-full market-pattern">
       {/* Header */}
       <div className="px-5 pt-5 pb-3.5 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
-        <div className="flex items-center justify-between gap-4 mb-3">
+        <div className="flex items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}
               className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/[0.06] text-primary dark:text-white"
             >
-              <Menu size={18} />
+              <Menu size={16} />
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none text-start">
+                <h1 className="font-outfit font-bold text-[20px] text-primary dark:text-white tracking-tight leading-none text-start">
                   {dict.notifications.title}
                 </h1>
                 <AnimatePresence>
@@ -199,7 +199,7 @@ function DesktopNotifications({ state }: { state: NotifPageState }) {
                       initial={{ scale: 0.7 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0.7 }}
-                      className="px-2 py-0.5 rounded-full font-inter font-bold text-[11px]
+                      className="px-2 py-0.5 rounded-full font-inter font-bold text-[10px]
                                  bg-primary/10 dark:bg-white/15 text-primary dark:text-white"
                     >
                       {unreadCount}
@@ -207,7 +207,7 @@ function DesktopNotifications({ state }: { state: NotifPageState }) {
                   )}
                 </AnimatePresence>
               </div>
-              <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5 text-start">
+              <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5 text-start">
                 {dict.notifications.subtitle}
               </p>
             </div>
@@ -217,10 +217,10 @@ function DesktopNotifications({ state }: { state: NotifPageState }) {
               onClick={markAllRead}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl shrink-0
                          bg-white dark:bg-white/[0.04] border border-gray-200 dark:border-white/10
-                         font-inter font-semibold text-[12px] text-text-secondary-light dark:text-text-secondary-dark
+                         font-inter font-semibold text-[11px] text-text-secondary-light dark:text-text-secondary-dark
                          hover:bg-gray-50 dark:hover:bg-white/[0.08] transition-colors"
             >
-              <CheckCheck size={13} /> {dict.notifications.markAllRead}
+              <CheckCheck size={11} /> {dict.notifications.markAllRead}
             </button>
           )}
         </div>
@@ -232,7 +232,7 @@ function DesktopNotifications({ state }: { state: NotifPageState }) {
               key={key}
               onClick={() => setActiveFilter(key)}
               className={cn(
-                'px-3.5 py-1 rounded-xl text-[12px] font-inter font-semibold border transition-all',
+                'px-3.5 py-1 rounded-xl text-[11px] font-inter font-semibold border transition-all',
                 activeFilter === key
                   ? 'bg-primary/10 dark:bg-white/12 border-primary/25 dark:border-white/20 text-primary dark:text-white'
                   : 'bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/[0.07] text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-white/[0.07]'
@@ -247,18 +247,18 @@ function DesktopNotifications({ state }: { state: NotifPageState }) {
       {/* List */}
       <div className="flex-1 overflow-y-auto min-h-0">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-4 px-8">
+          <div className="flex flex-col items-center justify-center h-64 gap-3 px-8">
             <div className="w-12 h-12 rounded-2xl bg-primary/[0.07] dark:bg-white/[0.07] flex items-center justify-center">
               <BellOff
-                size={22}
+                size={20}
                 className="text-primary/30 dark:text-white/30"
               />
             </div>
             <div className="text-center">
-              <h3 className="font-outfit font-bold text-[17px] text-text-primary-light dark:text-text-primary-dark">
+              <h3 className="font-outfit font-bold text-[16px] text-text-primary-light dark:text-text-primary-dark">
                 {dict.notifications.noNotifications}
               </h3>
-              <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-1">
+              <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-1">
                 {dict.notifications.noNotificationsDesc}
               </p>
             </div>
@@ -360,7 +360,7 @@ function MobileNotifCard({
         {/* Title */}
         <p
           className={cn(
-            'font-outfit text-[12px] tracking-[-0.2px] leading-[1.2] mb-1 text-start',
+            'font-outfit text-[11px] tracking-[-0.2px] leading-[1.2] mb-1 text-start',
             isUnread
               ? 'font-bold text-text-primary-light dark:text-text-primary-dark'
               : 'font-medium text-text-secondary-light dark:text-text-secondary-dark'
@@ -371,7 +371,7 @@ function MobileNotifCard({
 
         {/* Body */}
         <p
-          className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark
+          className="font-inter text-[10px] text-text-secondary-light dark:text-text-secondary-dark
                      font-normal leading-[1.45] line-clamp-2 text-start"
         >
           {notif.body}
@@ -396,7 +396,7 @@ function MobileFilterChip({
       whileTap={{ scale: 0.94 }}
       onClick={onTap}
       className={cn(
-        'shrink-0 px-[10px] py-[5px] rounded-[20px] font-inter font-semibold text-[11px] transition-colors border',
+        'shrink-0 px-[10px] py-[5px] rounded-[20px] font-inter font-semibold text-[10px] transition-colors border',
         isSelected
           ? 'bg-primary/[0.09] dark:bg-white/[0.12] border-primary/40 dark:border-white/30 text-primary dark:text-white'
           : 'bg-white/5 dark:bg-white/[0.05] border-transparent text-text-secondary-light dark:text-text-secondary-dark'
@@ -432,7 +432,7 @@ function MobileNotifications({ state }: { state: NotifPageState }) {
   return (
     <div className="lg:hidden flex flex-col h-full market-pattern">
       {/* Header */}
-      <div className="shrink-0 px-4 pt-[14px] pb-1">
+      <div className="shrink-0 px-4 pt-[14px] pb-0">
         <div className="flex items-center gap-3.5 mb-1">
           {/* Menu button */}
           <button
@@ -440,12 +440,12 @@ function MobileNotifications({ state }: { state: NotifPageState }) {
             className="w-8 h-8 rounded-full flex items-center justify-center
                        bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 shrink-0"
           >
-            <Menu size={14} className="text-primary dark:text-white" />
+            <Menu size={12} className="text-primary dark:text-white" />
           </button>
 
           {/* Title + unread badge */}
           <div className="flex items-center gap-2 flex-1">
-            <h1 className="font-outfit font-bold text-[16px] text-primary dark:text-white tracking-[-0.4px] leading-[1.15] text-start">
+            <h1 className="font-outfit font-bold text-[15px] text-primary dark:text-white tracking-[-0.4px] leading-[1.15] text-start">
               {dict.notifications.title}
             </h1>
             <AnimatePresence>
@@ -467,7 +467,7 @@ function MobileNotifications({ state }: { state: NotifPageState }) {
           {/* Mark all read */}
           {unreadCount > 0 && (
             <button onClick={markAllRead} className="shrink-0 p-1">
-              <span className="font-inter font-semibold text-[11px] text-text-secondary-light dark:text-text-secondary-dark">
+              <span className="font-inter font-semibold text-[10px] text-text-secondary-light dark:text-text-secondary-dark">
                 {dict.notifications.markAllRead}
               </span>
             </button>
@@ -476,7 +476,7 @@ function MobileNotifications({ state }: { state: NotifPageState }) {
       </div>
 
       {/* Filter chips */}
-      <div className="shrink-0 h-[52px] flex items-end pb-1">
+      <div className="shrink-0 pt-2 pb-1">
         <div className="flex items-center gap-2 px-4 overflow-x-auto no-scrollbar">
           {FILTER_KEYS.map((key) => (
             <MobileFilterChip
@@ -489,7 +489,7 @@ function MobileNotifications({ state }: { state: NotifPageState }) {
         </div>
       </div>
 
-      <div className="shrink-0 h-2" />
+
 
       {/* Card list */}
       <div className="flex-1 overflow-y-auto px-4 pb-8 min-h-0">
@@ -500,15 +500,15 @@ function MobileNotifications({ state }: { state: NotifPageState }) {
                          bg-primary/[0.07] dark:bg-white/[0.10]"
             >
               <BellOff
-                size={32}
+                size={28}
                 className="text-primary/50 dark:text-white/50"
               />
             </div>
             <div className="text-center">
-              <p className="font-outfit font-bold text-[16px] tracking-[-0.3px] text-text-primary-light dark:text-text-primary-dark mb-2">
+              <p className="font-outfit font-bold text-[15px] tracking-[-0.3px] text-text-primary-light dark:text-text-primary-dark mb-2">
                 {dict.notifications.noNotifications}
               </p>
-              <p className="font-inter text-[13px] text-text-secondary-light/75 dark:text-text-secondary-dark/75 leading-[1.5]">
+              <p className="font-inter text-[12px] text-text-secondary-light/75 dark:text-text-secondary-dark/75 leading-[1.5]">
                 {dict.notifications.noNotificationsDesc}
               </p>
             </div>

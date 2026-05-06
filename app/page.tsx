@@ -24,7 +24,7 @@ export default function LandingPage() {
     document.body.style.backgroundColor = '#0d0d0d'
     document.body.style.overscrollBehaviorY = 'none'
     // Set landing page scroll height inline so cleanup can remove it reliably
-    document.body.style.height = window.innerWidth < 768 ? '400vh' : '600vh'
+    document.body.style.height = window.innerWidth < 768 ? '400dvh' : '600dvh'
 
     const lerp = (a, b, t) => a + (b - a) * t
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v))

@@ -56,7 +56,7 @@ function MobileCompanyLogo({
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <span className="font-outfit font-bold text-white text-[12px]">
+          <span className="font-outfit font-bold text-white text-[11px]">
             {ticker[0]}
           </span>
         </div>
@@ -108,80 +108,79 @@ function StockRow({
             className="w-6 h-6 rounded-full flex items-center justify-center
                        bg-red-500/10 border border-red-500/30 text-red-500 hover:bg-red-500/20 transition-colors"
           >
-            <X size={12} />
+            <X size={10} />
           </motion.button>
         </td>
       )}
 
-      <td className="pl-4 py-3.5 w-8">
-        <span className="font-inter text-[11px] text-text-secondary-light/40 dark:text-text-secondary-dark/40 tabular-nums">
+      <td className="pl-4 py-3 w-8">
+        <span className="font-inter text-[10px] text-text-secondary-light/40 dark:text-text-secondary-dark/40 tabular-nums">
           {index + 1}
         </span>
       </td>
 
-      <td className="py-3.5 pr-4">
+      <td className="py-3 pr-4">
         <div className="flex items-center gap-2.5">
-          <CompanyLogo ticker={item.ticker} logoUrl={item.logoUrl} size={34} />
+          <CompanyLogo ticker={item.ticker} logoUrl={item.logoUrl} size={30} />
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-outfit font-bold text-[13px] text-text-primary-light dark:text-text-primary-dark">
+              <span className="font-outfit font-bold text-[12px] text-text-primary-light dark:text-text-primary-dark">
                 {item.ticker}
               </span>
               {item.hasWarning && (
-                <AlertTriangle size={12} className="text-warning" />
+                <AlertTriangle size={10} className="text-warning" />
               )}
             </div>
-            <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark leading-tight">
+            <p className="font-inter text-[10px] text-text-secondary-light dark:text-text-secondary-dark leading-tight">
               {item.name}
             </p>
           </div>
         </div>
       </td>
 
-      <td className="py-3.5 pe-5 text-end">
-        <span className="font-inter font-semibold text-[13px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
-          {formatPrice(item.currentPrice)}
-        </span>
-      </td>
-
-      <td className="py-3.5 pe-5 text-end">
-        <span
-          className={cn(
-            'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold',
-            item.isUp ? 'bg-bull/10 text-bull' : 'bg-bear/10 text-bear'
+      <td className="py-3 pe-5">
+        <div className="flex items-center justify-center gap-1.5">
+          <span
+            className={cn(
+              'font-inter font-semibold text-[12px]',
+              item.isUp ? 'text-bull' : 'text-bear'
+            )}
+          >
+            {item.isUp ? 'Up' : 'Down'}
+          </span>
+          {item.isUp ? (
+            <TrendingUp size={12} className="text-bull" />
+          ) : (
+            <TrendingDown size={12} className="text-bear" />
           )}
-        >
-          {item.isUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-          {formatPct(pct)}
-        </span>
-      </td>
-
-      <td className="py-3.5 pe-5 text-end hidden md:table-cell">
-        <div>
-          <span className="font-inter text-[12px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
-            {formatPrice(item.target1)}
-          </span>
-          <span className="ml-1 font-inter text-[10px] text-text-secondary-light/50 dark:text-text-secondary-dark/50 font-bold">
-            T1
-          </span>
         </div>
       </td>
 
-      <td className="py-3.5 pe-5 text-end hidden lg:table-cell">
-        <div>
-          <span className="font-inter text-[12px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
-            {formatPrice(item.target2)}
+      <td className="py-3 pe-5">
+        <div className="flex flex-col items-end">
+          <span className="font-inter font-bold text-[13px] text-text-primary-light dark:text-text-primary-dark tabular-nums tracking-[-0.3px]">
+            {formatPrice(item.currentPrice)}
           </span>
-          <span className="ml-1 font-inter text-[10px] text-text-secondary-light/50 dark:text-text-secondary-dark/50 font-bold">
-            T2
-          </span>
+          <div
+            className={cn(
+              'mt-1 flex items-center justify-center px-2 py-0.5 rounded-[6px] border',
+              item.isUp
+                ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400'
+                : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
+            )}
+          >
+            <span className="font-inter font-bold text-[10px] tabular-nums tracking-tight">
+              {pct >= 0 ? '+' : ''}
+              {pct.toFixed(1)}%
+            </span>
+          </div>
         </div>
       </td>
 
-      <td className="py-3.5 pr-4 w-14">
+      <td className="py-3 pr-4 w-14">
         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
           <div
-            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold
                           bg-primary/8 dark:bg-white/8 text-primary dark:text-white"
           >
             <MessageSquare size={10} />
@@ -242,13 +241,13 @@ function AddStockModal({
           <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-700" />
         </div>
 
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-white/[0.06]">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-white/[0.06]">
           <div className="flex-1">
-            <h2 className="font-outfit font-bold text-[17px] text-primary dark:text-white">
+            <h2 className="font-outfit font-bold text-[15px] text-primary dark:text-white">
               {dict.watchlist.addStock}
             </h2>
-            <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark">
-              {watchlist.length} {dict.watchlist.subtitle}
+            <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark">
+              {dict.watchlist.subtitle}
             </p>
           </div>
           <button
@@ -256,17 +255,17 @@ function AddStockModal({
             className="w-7 h-7 rounded-full bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center
                        text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
           >
-            <X size={13} />
+            <X size={11} />
           </button>
         </div>
 
-        <div className="px-5 py-3 border-b border-gray-100 dark:border-white/[0.06]">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-white/[0.06]">
           <div
             className="flex items-center gap-2 px-3 h-9 rounded-lg
                           bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08]"
           >
             <Search
-              size={14}
+              size={12}
               className="text-text-secondary-light dark:text-text-secondary-dark shrink-0"
             />
             <input
@@ -275,14 +274,14 @@ function AddStockModal({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search ticker or company…"
-              className="flex-1 bg-transparent outline-none font-inter text-[13px]
+              className="flex-1 bg-transparent outline-none font-inter text-[12px]
                          text-text-primary-light dark:text-text-primary-dark
                          placeholder:text-text-secondary-light/50 dark:placeholder:text-text-secondary-dark/50"
             />
             {query && (
               <button onClick={() => setQuery('')}>
                 <X
-                  size={12}
+                  size={10}
                   className="text-text-secondary-light dark:text-text-secondary-dark"
                 />
               </button>
@@ -310,7 +309,7 @@ function AddStockModal({
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="py-10 text-center">
-                    <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark">
+                    <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark">
                       No results for "{query}"
                     </p>
                   </td>
@@ -331,17 +330,17 @@ function AddStockModal({
                             size={30}
                           />
                           <div>
-                            <p className="font-outfit font-bold text-[12px] text-text-primary-light dark:text-text-primary-dark">
+                            <p className="font-outfit font-bold text-[11px] text-text-primary-light dark:text-text-primary-dark">
                               {stock.ticker}
                             </p>
-                            <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark">
+                            <p className="font-inter text-[10px] text-text-secondary-light dark:text-text-secondary-dark">
                               {stock.name}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="pe-4 py-2.5 text-end">
-                        <span className="font-inter font-semibold text-[12px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
+                        <span className="font-inter font-semibold text-[11px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
                           {formatPrice(stock.currentPrice)}
                         </span>
                       </td>
@@ -351,7 +350,7 @@ function AddStockModal({
                             isAdded ? onRemove(stock.ticker) : onAdd(stock)
                           }
                           className={cn(
-                            'px-3 py-1 rounded-lg text-[11px] font-semibold transition-colors',
+                            'px-3 py-1 rounded-lg text-[10px] font-semibold transition-colors',
                             isAdded
                               ? 'bg-bull/10 text-bull border border-bull/20 hover:bg-bull/15'
                               : 'bg-primary/8 dark:bg-white/8 text-primary dark:text-white border border-primary/15 dark:border-white/12 hover:bg-primary/14 dark:hover:bg-white/14'
@@ -373,7 +372,7 @@ function AddStockModal({
         {/* Mobile: card list (Flutter-style) */}
         <div className="sm:hidden overflow-y-auto max-h-[55vh] px-4 py-2 space-y-3">
           {filtered.length === 0 ? (
-            <p className="text-center font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark py-10">
+            <p className="text-center font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark py-10">
               No results for "{query}"
             </p>
           ) : (
@@ -394,22 +393,22 @@ function AddStockModal({
                     logoUrl={stock.logoUrl}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-outfit font-semibold text-[13px] text-text-primary-light dark:text-text-primary-dark">
+                    <p className="font-outfit font-semibold text-[12px] text-text-primary-light dark:text-text-primary-dark">
                       {stock.ticker}
                     </p>
-                    <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark truncate">
+                    <p className="font-inter text-[10px] text-text-secondary-light dark:text-text-secondary-dark truncate">
                       {stock.name}
                     </p>
                   </div>
                   <div className="flex flex-col items-end mr-2">
-                    <span className="font-inter font-semibold text-[13px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
+                    <span className="font-inter font-semibold text-[12px] text-text-primary-light dark:text-text-primary-dark tabular-nums">
                       {formatPrice(stock.currentPrice)}
                     </span>
                     <div className="flex items-center gap-0.5 mt-1">
                       {stock.isUp ? (
-                        <ArrowUpRight size={12} className="text-bull" />
+                        <ArrowUpRight size={10} className="text-bull" />
                       ) : (
-                        <ArrowDownRight size={12} className="text-bear" />
+                        <ArrowDownRight size={10} className="text-bear" />
                       )}
                       <span
                         className={cn(
@@ -439,7 +438,7 @@ function AddStockModal({
                         ✓
                       </span>
                     ) : (
-                      <Plus size={16} />
+                      <Plus size={14} />
                     )}
                   </button>
                 </div>
@@ -473,14 +472,14 @@ function DesktopWatchlist({
   return (
     <div className="hidden lg:flex flex-col h-full market-pattern">
       {/* Header */}
-      <div className="px-5 pt-5 pb-4 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
+      <div className="px-4 pt-5 pb-4 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="font-outfit font-bold text-[22px] text-primary dark:text-white tracking-tight leading-none">
+            <h1 className="font-outfit font-bold text-[20px] text-primary dark:text-white tracking-tight leading-none">
               {dict.watchlist.title}
             </h1>
-            <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
-              {items.length} {dict.watchlist.subtitle}
+            <p className="font-inter text-[11px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
+              {dict.watchlist.subtitle}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -490,9 +489,9 @@ function DesktopWatchlist({
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl
                            bg-gray-100 dark:bg-white/[0.06] border border-gray-200 dark:border-white/10
                            text-text-secondary-light dark:text-text-secondary-dark
-                           font-inter font-semibold text-[12px] transition-colors hover:bg-gray-200 dark:hover:bg-white/10"
+                           font-inter font-semibold text-[11px] transition-colors hover:bg-gray-200 dark:hover:bg-white/10"
               >
-                <X size={13} /> {dict.watchlist.cancel}
+                <X size={11} /> {dict.watchlist.cancel}
               </button>
             ) : (
               <>
@@ -501,17 +500,17 @@ function DesktopWatchlist({
                   className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl
                              bg-gray-100 dark:bg-white/[0.06] border border-gray-200 dark:border-white/10
                              text-text-secondary-light dark:text-text-secondary-dark
-                             font-inter font-semibold text-[12px] transition-colors hover:bg-gray-200 dark:hover:bg-white/10"
+                             font-inter font-semibold text-[11px] transition-colors hover:bg-gray-200 dark:hover:bg-white/10"
                 >
-                  <Trash2 size={13} /> {dict.watchlist.manage}
+                  <Trash2 size={11} /> {dict.watchlist.manage}
                 </button>
                 <button
                   onClick={() => setShowAddModal(true)}
                   className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl
                              bg-primary dark:bg-white text-white dark:text-black
-                             font-inter font-semibold text-[12px] transition-opacity hover:opacity-90"
+                             font-inter font-semibold text-[11px] transition-opacity hover:opacity-90"
                 >
-                  <Plus size={13} /> {dict.watchlist.add}
+                  <Plus size={11} /> {dict.watchlist.add}
                 </button>
               </>
             )}
@@ -525,15 +524,15 @@ function DesktopWatchlist({
           <div className="flex flex-col items-center justify-center h-64 gap-4">
             <div className="w-14 h-14 rounded-2xl bg-primary/[0.07] dark:bg-white/[0.07] flex items-center justify-center">
               <BarChart2
-                size={26}
+                size={22}
                 className="text-primary/30 dark:text-white/30"
               />
             </div>
             <div className="text-center">
-              <h3 className="font-outfit font-bold text-[17px] text-text-primary-light dark:text-text-primary-dark">
+              <h3 className="font-outfit font-bold text-[15px] text-text-primary-light dark:text-text-primary-dark">
                 {dict.watchlist.emptyTitle}
               </h3>
-              <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-1">
+              <p className="font-inter text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-1">
                 {dict.watchlist.emptyDesc}
               </p>
             </div>
@@ -541,9 +540,9 @@ function DesktopWatchlist({
               onClick={() => setShowAddModal(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl
                          bg-primary dark:bg-white text-white dark:text-black
-                         font-inter font-semibold text-[13px]"
+                         font-inter font-semibold text-[12px]"
             >
-              <Plus size={14} /> {dict.watchlist.addFirst}
+              <Plus size={12} /> {dict.watchlist.addFirst}
             </button>
           </div>
         ) : (
@@ -558,17 +557,11 @@ function DesktopWatchlist({
                   <th className="py-2.5 pe-4 text-start font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">
                     {dict.watchlist.company}
                   </th>
+                  <th className="py-2.5 text-center font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">
+                    Direction
+                  </th>
                   <th className="py-2.5 pe-5 text-end font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">
                     {dict.watchlist.price}
-                  </th>
-                  <th className="py-2.5 pe-5 text-end font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">
-                    {dict.watchlist.toT1}
-                  </th>
-                  <th className="py-2.5 pe-5 text-end hidden md:table-cell font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">
-                    {dict.watchlist.target1}
-                  </th>
-                  <th className="py-2.5 pe-5 text-end hidden lg:table-cell font-inter text-[10px] font-bold uppercase tracking-wider text-text-secondary-light/50 dark:text-text-secondary-dark/50">
-                    {dict.watchlist.target2}
                   </th>
 
                   <th className="py-2.5 pr-4 w-14" />
@@ -608,22 +601,22 @@ function MobileColumnHeaders({ deletionMode }: { deletionMode: boolean }) {
                       bg-white/85 dark:bg-white/[0.04]"
       >
         {deletionMode && <div className="w-9 shrink-0" />}
-        {/* SYM — flex 4 */}
-        <div className="flex-[4] text-start">
+        {/* SYM */}
+        <div className="flex-1 text-start">
           <span className="font-inter font-semibold text-[10px] text-text-secondary-light dark:text-text-secondary-dark tracking-[0.35px]">
             SYM
           </span>
         </div>
-        {/* PRICE — flex 3 */}
-        <div className="flex-[3] text-center">
+        {/* DIRECTION */}
+        <div className="flex-1 text-center">
           <span className="font-inter font-semibold text-[10px] text-text-secondary-light dark:text-text-secondary-dark tracking-[0.35px]">
-            PRICE
+            DIRECTION
           </span>
         </div>
-        {/* TARGETS — flex 3 */}
-        <div className="flex-[3] text-end">
+        {/* PRICE */}
+        <div className="flex-1 text-end">
           <span className="font-inter font-semibold text-[10px] text-text-secondary-light dark:text-text-secondary-dark tracking-[0.35px]">
-            TARGETS
+            PRICE
           </span>
         </div>
       </div>
@@ -687,12 +680,12 @@ function MobileWatchCard({
           </motion.button>
         )}
 
-        {/* COLUMN 1 — SYM (flex 4) */}
-        <div className="flex-[4] flex items-center gap-2 min-w-0">
+        {/* COLUMN 1 — SYM */}
+        <div className="flex-1 flex items-center gap-2 min-w-0">
           <MobileCompanyLogo ticker={item.ticker} logoUrl={item.logoUrl} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
-              <span className="font-outfit font-semibold text-[11px] text-text-primary-light dark:text-text-primary-dark tracking-[-0.2px]">
+              <span className="font-outfit font-semibold text-[10px] text-text-primary-light dark:text-text-primary-dark tracking-[-0.2px]">
                 {item.ticker}
               </span>
               {item.hasWarning && (
@@ -705,43 +698,38 @@ function MobileWatchCard({
           </div>
         </div>
 
-        {/* COLUMN 2 — PRICE & DIFF (flex 3) */}
-        <div className="flex-[3] flex flex-col items-center">
-          <span className="font-inter font-semibold text-[11px] text-text-primary-light dark:text-text-primary-dark tabular-nums tracking-[-0.35px]">
+        {/* COLUMN 2 — DIRECTION */}
+        <div className="flex-1 flex items-center justify-center gap-1.5">
+          <span
+            className={cn(
+              'font-inter font-semibold text-[12px]',
+              item.isUp ? 'text-bull' : 'text-bear'
+            )}
+          >
+            {item.isUp ? 'Up' : 'Down'}
+          </span>
+          {item.isUp ? (
+            <TrendingUp size={12} className="text-bull" />
+          ) : (
+            <TrendingDown size={12} className="text-bear" />
+          )}
+        </div>
+
+        {/* COLUMN 3 — PRICE */}
+        <div className="flex-1 flex flex-col items-end mr-2">
+          <span className="font-inter font-bold text-[13px] text-text-primary-light dark:text-text-primary-dark tabular-nums tracking-[-0.3px]">
             {formatPrice(item.currentPrice)}
           </span>
           <div
-            className="mt-1 px-1.5 py-[3px] rounded-[6px] border"
-            style={{
-              backgroundColor: `${trendColor}1F`,
-              borderColor: `${trendColor}2E`,
-            }}
+            className={cn(
+              'mt-1.5 flex items-center justify-center px-2 py-0.5 rounded-[6px] border',
+              item.isUp
+                ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400'
+                : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
+            )}
           >
-            <span
-              className="font-inter font-semibold text-[10px] leading-none"
-              style={{ color: trendColor }}
-            >
+            <span className="font-inter font-bold text-[10px] tabular-nums tracking-tight">
               {pctStr}
-            </span>
-          </div>
-        </div>
-
-        {/* COLUMN 3 — TARGETS (flex 3) */}
-        <div className="flex-[3] flex flex-col items-end">
-          <div className="flex items-baseline gap-1">
-            <span className="font-inter text-[9.5px] font-semibold text-gray-500 tracking-[0.2px]">
-              T1
-            </span>
-            <span className="font-inter text-[10px] font-medium text-text-primary-light dark:text-gray-400 tabular-nums">
-              {formatPrice(item.target1)}
-            </span>
-          </div>
-          <div className="flex items-baseline gap-1 mt-[5px]">
-            <span className="font-inter text-[9.5px] font-semibold text-gray-500 tracking-[0.2px]">
-              T2
-            </span>
-            <span className="font-inter text-[10px] font-medium text-text-primary-light dark:text-gray-400 tabular-nums">
-              {formatPrice(item.target2)}
             </span>
           </div>
         </div>
@@ -779,7 +767,7 @@ function MobileWatchlist({
             className="w-8 h-8 rounded-full flex items-center justify-center
                        bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 shrink-0"
           >
-            <Menu size={14} className="text-primary dark:text-white" />
+            <Menu size={12} className="text-primary dark:text-white" />
           </button>
 
           {/* Title */}
@@ -793,7 +781,7 @@ function MobileWatchlist({
               onClick={() => setDeletionMode(false)}
               className="flex items-center gap-1 px-3 py-[7px] rounded-[10px] border
                          bg-red-500/8 dark:bg-red-500/12 border-red-500/28 text-red-400
-                         font-inter font-semibold text-[11px]"
+                         font-inter font-semibold text-[10px]"
             >
               {dict.watchlist.cancel}
             </button>
@@ -805,7 +793,7 @@ function MobileWatchlist({
                 className="w-8 h-8 rounded-full flex items-center justify-center
                            bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10"
               >
-                <Plus size={15} className="text-primary dark:text-white" />
+                <Plus size={13} className="text-primary dark:text-white" />
               </button>
               {/* Delete */}
               <button
@@ -814,7 +802,7 @@ function MobileWatchlist({
                            bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10"
               >
                 <Trash2
-                  size={14}
+                  size={12}
                   className="text-text-secondary-light dark:text-text-secondary-dark"
                 />
               </button>
@@ -833,14 +821,14 @@ function MobileWatchlist({
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 gap-4 px-8">
             <BarChart2
-              size={40}
+              size={34}
               className="text-primary/22 dark:text-white/22"
             />
             <div className="text-center">
               <p className="font-outfit font-bold text-[15px] text-text-secondary-light dark:text-text-secondary-dark">
                 {dict.watchlist.emptyTitle}
               </p>
-              <p className="font-inter font-medium text-[12px] text-text-secondary-light dark:text-text-secondary-dark mt-2">
+              <p className="font-inter font-medium text-[11px] text-text-secondary-light dark:text-text-secondary-dark mt-2">
                 {dict.watchlist.addFirst}
               </p>
             </div>
