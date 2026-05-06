@@ -94,6 +94,7 @@ export const dictionaries = {
       "14Days": "14 Days",
       "30Days": "30 Days",
       all: "All",
+      filter: "Filter",
     },
     profile: {
       title: "Account & Settings",
@@ -236,6 +237,7 @@ export const dictionaries = {
       "14Days": "14 يوم",
       "30Days": "30 يوم",
       all: "الكل",
+      filter: "تصفية",
     },
     profile: {
       title: "الحساب والإعدادات",

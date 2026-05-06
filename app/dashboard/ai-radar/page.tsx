@@ -294,7 +294,7 @@ function FilterPopover({
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-outfit font-bold text-[18px] text-primary dark:text-white">
-            {(dict.radar as any).filter || 'Filters'}
+            {dict.radar.filter || 'Filters'}
           </h3>
           <button
             onClick={onClose}
