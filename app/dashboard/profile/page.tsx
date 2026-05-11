@@ -895,18 +895,18 @@ function MobileProfileLayout({
     <div className="lg:hidden flex flex-col h-full market-pattern">
       {/* Header — matches Flutter style */}
       <div className="flex items-center justify-center h-[56px] relative border-b border-gray-100 dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm shrink-0 px-4">
+        <span className="font-outfit font-bold text-[18px] text-primary dark:text-white tracking-wide">
+          {dict.sidebar.profile}
+        </span>
         <button
           onClick={() => setMobileOpen(true)}
           className={cn(
             'absolute w-10 h-10 flex items-center justify-center text-primary dark:text-white',
-            isRTL ? 'right-4' : 'left-4'
+            isRTL ? 'left-4' : 'right-4'
           )}
         >
           <Menu size={20} />
         </button>
-        <span className="font-outfit font-bold text-[18px] text-primary dark:text-white tracking-wide">
-          {dict.sidebar.profile}
-        </span>
       </div>
 
       <div className="flex-1 overflow-y-auto">

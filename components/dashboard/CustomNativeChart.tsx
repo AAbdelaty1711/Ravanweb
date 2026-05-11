@@ -1,15 +1,94 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart, ColorType, CandlestickSeries } from 'lightweight-charts';
-import { ChevronDown, Search, X, Menu, MessageSquare } from 'lucide-react';
+import { createChart, ColorType, CandlestickSeries, CrosshairMode } from 'lightweight-charts';
+import { ChevronDown, Search, X, Menu, MessageSquare, Activity, User, Settings, CreditCard, HelpCircle, LogOut } from 'lucide-react';
+import { CompanyLogo } from '@/components/ui/CompanyLogo';
+import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+// ─── User popover ─────────────────────────────────────────────────────────────
+function UserPopover({
+  onClose,
+  triggerRef,
+}: {
+  onClose: () => void
+  triggerRef: React.RefObject<HTMLButtonElement | null>
+}) {
+  const router = useRouter()
+  const { dict } = useLanguage()
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (triggerRef.current?.contains(e.target as Node)) return
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [onClose, triggerRef])
+
+  const items = [
+    { icon: User, label: dict.sidebar.profile, action: () => { router.push('/dashboard/profile'); onClose() } },
+    { icon: Settings, label: dict.sidebar.settings, action: () => { router.push('/dashboard/profile'); onClose() } },
+    { icon: CreditCard, label: dict.sidebar.upgrade, action: onClose },
+    { icon: HelpCircle, label: dict.sidebar.help, action: onClose },
+  ]
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.97 }}
+      transition={{ duration: 0.15 }}
+      className={cn(
+        'absolute top-full left-0 mt-2 z-50',
+        'bg-white dark:bg-[#1A1A24] rounded-2xl shadow-xl',
+        'border border-gray-200 dark:border-white/10',
+        'overflow-hidden w-52'
+      )}
+    >
+      <div className="px-3 py-2.5 border-b border-gray-100 dark:border-white/[0.06]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-primary/12 dark:bg-white/12 flex items-center justify-center shrink-0">
+            <span className="font-outfit font-bold text-[12px] text-primary dark:text-white">AA</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-inter font-semibold text-[12px] text-text-primary-light dark:text-text-primary-dark truncate">Ahmed Abdelaty</p>
+            <p className="font-inter text-[10px] text-text-secondary-light dark:text-text-secondary-dark truncate">Free Plan</p>
+          </div>
+        </div>
+      </div>
+      <div className="py-1">
+        {items.map(({ icon: Icon, label, action }) => (
+          <button key={label} onClick={action} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-start hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors">
+            <Icon size={12} className="text-text-secondary-light dark:text-text-secondary-dark shrink-0" />
+            <span className="font-inter text-[12px] text-text-primary-light dark:text-text-primary-dark">{label}</span>
+          </button>
+        ))}
+      </div>
+      <div className="border-t border-gray-100 dark:border-white/[0.06] py-1">
+        <button onClick={() => { document.cookie = 'raven_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'; router.push('/'); onClose(); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-start hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+          <LogOut size={12} className="text-red-500 shrink-0" />
+          <span className="font-inter text-[12px] text-red-500">{dict.sidebar.logout}</span>
+        </button>
+      </div>
+    </motion.div>
+  )
+}
 import { useTheme } from 'next-themes';
 import { useSidebar } from '@/components/SidebarContext';
 
 export default function CustomNativeChart({ onOpenChat }: { onOpenChat?: () => void }) {
-  const { setMobileOpen } = useSidebar();
+  const { mobileOpen, setMobileOpen } = useSidebar();
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
   const [hoverData, setHoverData] = useState<{ time: string, open: number, high: number, low: number, close: number } | null>(null);
+
+  const [showUserPopover, setShowUserPopover] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const TIME_INTERVALS = [
     {
@@ -85,6 +164,9 @@ export default function CustomNativeChart({ onOpenChat }: { onOpenChat?: () => v
       },
       rightPriceScale: {
         borderColor: gridColor,
+      },
+      crosshair: {
+        mode: CrosshairMode.Normal,
       },
     });
 
@@ -200,35 +282,46 @@ export default function CustomNativeChart({ onOpenChat }: { onOpenChat?: () => v
         }
       `}</style>
       
-      <div className="h-14 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-2 lg:px-4 bg-gray-50 dark:bg-[#1a202c] shrink-0 relative z-30">
-        <div className="flex items-center gap-2 lg:gap-4">
-          {/* Mobile Sidebar Toggle */}
-          <button 
-            onClick={() => setMobileOpen(true)}
-            className="lg:hidden w-8 h-8 rounded-full flex items-center justify-center text-primary dark:text-white hover:bg-gray-200 dark:hover:bg-white/5 transition-colors shrink-0"
-          >
-            <Menu size={16} />
-          </button>
+      <div className="h-12 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-0 lg:px-0 bg-gray-50 dark:bg-[#1a202c] shrink-0 relative z-30">
+        <div className="flex items-center h-full">
+          {/* Profile Button */}
+          <div className="relative flex items-center h-full border-r border-gray-200 dark:border-gray-800 px-3">
+            <button
+              ref={triggerRef}
+              onClick={() => setShowUserPopover(!showUserPopover)}
+              className="w-7 h-7 rounded-full bg-primary/12 dark:bg-white/12 flex items-center justify-center hover:ring-2 ring-primary/20 transition-all focus:outline-none"
+            >
+              <span className="font-outfit font-bold text-[10px] text-primary dark:text-white">AA</span>
+            </button>
+            <AnimatePresence>
+              {showUserPopover && (
+                <UserPopover
+                  onClose={() => setShowUserPopover(false)}
+                  triggerRef={triggerRef}
+                />
+              )}
+            </AnimatePresence>
+          </div>
 
           <button 
             onClick={() => setIsSearchOpen(true)}
-            className="font-bold text-[14px] lg:text-[15px] text-gray-900 dark:text-white hover:text-green-500 transition-colors flex items-center gap-1.5 lg:gap-2"
+            className="flex items-center h-full gap-1.5 px-3 font-bold text-[13px] text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors border-r border-gray-200 dark:border-gray-800"
           >
-            {selectedSymbol}
             <Search className="w-3.5 h-3.5 text-gray-400"/>
+            {selectedSymbol}
           </button>
           
-          <div className="relative">
+          <div className="relative h-full flex items-center border-r border-gray-200 dark:border-gray-800">
             <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
+              className="flex items-center h-full gap-1 px-3 font-bold text-[13px] text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
             >
               {selectedInterval}
-              <ChevronDown className={`w-4 h-4 ml-1 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-[#1e222d] border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2 z-50 h-max max-h-96 overflow-y-auto">
+              <div className="absolute top-full left-0 mt-0.5 w-48 bg-white dark:bg-[#1e222d] border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2 z-50 h-max max-h-96 overflow-y-auto">
                 {TIME_INTERVALS.map((group) => (
                   <div key={group.label} className="mb-2 last:mb-0">
                     <div className="px-4 py-1 text-[11px] font-bold text-gray-400 dark:text-gray-500 tracking-wider">
@@ -252,15 +345,22 @@ export default function CustomNativeChart({ onOpenChat }: { onOpenChat?: () => v
               </div>
             )}
           </div>
+
+          <button
+            className="flex items-center h-full gap-1.5 px-3 font-bold text-[13px] text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors border-r border-gray-200 dark:border-gray-800"
+          >
+            <Activity className="w-4 h-4 text-gray-400" />
+            Indicators
+          </button>
         </div>
 
-        {/* Mobile Chat Toggle */}
-        <div className="flex items-center">
+        {/* Mobile Actions: Sidebar Toggle */}
+        <div className="flex items-center lg:hidden">
           <button 
-            onClick={onOpenChat}
-            className="lg:hidden w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 dark:bg-white/[0.06] text-primary dark:text-white shrink-0 hover:bg-primary/20 transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 dark:bg-white/[0.06] text-primary dark:text-white shrink-0 hover:bg-gray-300 dark:hover:bg-white/10 transition-colors"
           >
-            <MessageSquare size={14} />
+            <Menu size={16} />
           </button>
         </div>
       </div>
@@ -325,15 +425,16 @@ export default function CustomNativeChart({ onOpenChat }: { onOpenChat?: () => v
                       setIsSearchOpen(false);
                       setSearchQuery('');
                     }}
-                    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors text-left"
+                    className="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer"
                   >
-                    <div className="flex flex-col">
-                      <span className="font-bold text-gray-900 dark:text-white">{item.symbol}</span>
-                      <span className="text-xs text-gray-500">{item.name}</span>
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <CompanyLogo ticker={item.symbol} logoUrl="" size={32} />
+                      <div className="flex items-baseline gap-2 truncate">
+                        <span className="font-outfit font-bold text-[13px] text-gray-900 dark:text-white">{item.symbol}</span>
+                        <span className="font-inter text-[11px] text-gray-500 dark:text-gray-400 truncate">{item.name}</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col items-end">
-                      <span className="text-xs font-medium text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded">{item.exchange}</span>
-                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-gray-100 dark:bg-white/10 text-gray-500 shrink-0">{item.exchange}</span>
                   </button>
                 ))
               ) : (

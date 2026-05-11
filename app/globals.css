@@ -120,6 +120,10 @@
            rounded-card;
   }
 
+  .panel-container {
+    container-type: inline-size;
+  }
+
   .raven-accent {
     @apply text-primary dark:text-primary-dark;
   }
