@@ -31,11 +31,10 @@ function MobileCompanyLogo({
   logoUrl,
 }: {
   ticker: string
-  logoUrl?: string
+  logoUrl: string
 }) {
   const [imgFailed, setImgFailed] = useState(false)
   const grad = TICKER_GRADIENTS[ticker] ?? ['#7C7C7C', '#3C3C3C']
-  const fmpLogoUrl = `https://financialmodelingprep.com/image-stock/${ticker}.png`
   return (
     <div
       className="shrink-0 w-8 h-8 rounded-[9px] overflow-hidden border border-white/10 dark:border-white/12"
@@ -44,7 +43,7 @@ function MobileCompanyLogo({
       {!imgFailed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={fmpLogoUrl}
+          src={logoUrl}
           alt={ticker}
           width={40}
           height={40}
