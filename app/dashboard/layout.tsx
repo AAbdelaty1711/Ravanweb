@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
 import { SidebarProvider } from '@/components/SidebarContext'
 import { BodyClassManager } from '@/components/BodyClassManager'
@@ -11,6 +12,8 @@ import NotificationsPanel from '@/components/dashboard/NotificationsPanel'
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [activePanel, setActivePanel] = useState<string | null>(null)
+  const pathname = usePathname()
+  const isProfilePage = pathname === '/dashboard/profile'
 
   return (
     <SidebarProvider>
@@ -57,7 +60,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        <Sidebar activePanel={activePanel} setActivePanel={setActivePanel} />
+        {!isProfilePage && <Sidebar activePanel={activePanel} setActivePanel={setActivePanel} />}
       </div>
     </SidebarProvider>
   )

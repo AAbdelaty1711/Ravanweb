@@ -599,6 +599,7 @@ function DesktopProfileLayout({
   notifEnabled,
   setNotifEnabled,
   handleLogout,
+  router,
 }: {
   name: string
   setName: (n: string) => void
@@ -607,6 +608,7 @@ function DesktopProfileLayout({
   notifEnabled: boolean
   setNotifEnabled: (v: boolean) => void
   handleLogout: () => void
+  router: any
 }) {
   const [activeSection, setActiveSection] = useState<DesktopSection>('account')
   const [showEdit, setShowEdit] = useState(false)
@@ -628,13 +630,22 @@ function DesktopProfileLayout({
   return (
     <div className="hidden lg:flex flex-col h-full market-pattern">
       {/* Desktop header */}
-      <div className="px-8 pt-6 pb-4 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm">
-        <h1 className="font-outfit font-bold text-[24px] text-primary dark:text-white tracking-tight text-start">
-          {dict.preferences.title}
-        </h1>
-        <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5 text-start">
-          Manage your profile, preferences, and security
-        </p>
+      <div className="px-8 pt-6 pb-4 border-b border-gray-100 dark:border-white/[0.06] shrink-0 bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm flex items-center gap-4">
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="p-2 bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/10 text-text-primary-light dark:text-text-primary-dark rounded-xl transition-colors shrink-0"
+          title="Back to Dashboard"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <div className="text-start">
+          <h1 className="font-outfit font-bold text-[24px] text-primary dark:text-white tracking-tight">
+            {dict.preferences.title}
+          </h1>
+          <p className="font-inter text-[13px] text-text-secondary-light dark:text-text-secondary-dark mt-0.5">
+            Manage your profile, preferences, and security
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden min-h-0">
@@ -878,6 +889,7 @@ function MobileProfileLayout({
   notifEnabled,
   setNotifEnabled,
   handleLogout,
+  router,
 }: {
   name: string
   setName: (n: string) => void
@@ -886,6 +898,7 @@ function MobileProfileLayout({
   notifEnabled: boolean
   setNotifEnabled: (v: boolean) => void
   handleLogout: () => void
+  router: any
 }) {
   const { setMobileOpen } = useSidebar()
   const [showEdit, setShowEdit] = useState(false)
@@ -895,18 +908,19 @@ function MobileProfileLayout({
     <div className="lg:hidden flex flex-col h-full market-pattern">
       {/* Header — matches Flutter style */}
       <div className="flex items-center justify-center h-[56px] relative border-b border-gray-100 dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.02] backdrop-blur-sm shrink-0 px-4">
+        <button
+          onClick={() => router.push('/dashboard')}
+          className={cn(
+            'absolute w-10 h-10 flex items-center justify-center text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors',
+            isRTL ? 'right-4' : 'left-4'
+          )}
+          title="Back to Dashboard"
+        >
+          <ChevronLeft size={20} />
+        </button>
         <span className="font-outfit font-bold text-[18px] text-primary dark:text-white tracking-wide">
           {dict.sidebar.profile}
         </span>
-        <button
-          onClick={() => setMobileOpen(true)}
-          className={cn(
-            'absolute w-10 h-10 flex items-center justify-center text-primary dark:text-white',
-            isRTL ? 'left-4' : 'right-4'
-          )}
-        >
-          <Menu size={20} />
-        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -1075,9 +1089,9 @@ export default function ProfilePage() {
   return (
     <div className="h-full">
       {/* Desktop */}
-      <DesktopProfileLayout {...shared} />
+      <DesktopProfileLayout {...shared} router={router} />
       {/* Mobile */}
-      <MobileProfileLayout {...shared} />
+      <MobileProfileLayout {...shared} router={router} />
     </div>
   )
 }
