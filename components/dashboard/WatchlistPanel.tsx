@@ -37,8 +37,13 @@ function MobileCompanyLogo({
   const grad = TICKER_GRADIENTS[ticker] ?? ['#7C7C7C', '#3C3C3C']
   return (
     <div
-      className="shrink-0 w-8 h-8 rounded-[9px] overflow-hidden border border-white/10 dark:border-white/12"
-      style={{ background: `linear-gradient(135deg, ${grad[0]}, ${grad[1]})` }}
+      className={cn(
+        "shrink-0 w-8 h-8 rounded-[9px] overflow-hidden border flex items-center justify-center transition-colors",
+        imgFailed 
+          ? "border-white/10 dark:border-white/12" 
+          : "border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5"
+      )}
+      style={imgFailed ? { background: `linear-gradient(135deg, ${grad[0]}, ${grad[1]})` } : {}}
     >
       {!imgFailed ? (
         // eslint-disable-next-line @next/next/no-img-element

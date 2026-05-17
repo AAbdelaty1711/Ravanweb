@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TICKER_GRADIENTS } from "@/lib/mock-data";
+import { cn } from "@/lib/utils";
 
 export function CompanyLogo({
   ticker,
@@ -17,11 +18,16 @@ export function CompanyLogo({
 
   return (
     <div
-      className="shrink-0 rounded-avatar overflow-hidden border border-white/10 dark:border-white/12"
+      className={cn(
+        "shrink-0 rounded-avatar overflow-hidden border flex items-center justify-center transition-colors",
+        imgFailed 
+          ? "border-white/10 dark:border-white/12" 
+          : "border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5"
+      )}
       style={{
         width: size,
         height: size,
-        background: `linear-gradient(135deg, ${grad[0]}, ${grad[1]})`,
+        ...(imgFailed ? { background: `linear-gradient(135deg, ${grad[0]}, ${grad[1]})` } : {})
       }}
     >
       {!imgFailed ? (
