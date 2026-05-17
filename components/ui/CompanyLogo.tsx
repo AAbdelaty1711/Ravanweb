@@ -9,11 +9,12 @@ export function CompanyLogo({
   size = 40,
 }: {
   ticker: string;
-  logoUrl: string;
+  logoUrl?: string;
   size?: number;
 }) {
   const [imgFailed, setImgFailed] = useState(false);
   const grad = TICKER_GRADIENTS[ticker] ?? ["#7C7C7C", "#3C3C3C"];
+  const fmpLogoUrl = `https://financialmodelingprep.com/image-stock/${ticker}.png`;
 
   return (
     <div
@@ -27,7 +28,7 @@ export function CompanyLogo({
       {!imgFailed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={logoUrl}
+          src={fmpLogoUrl}
           alt={ticker}
           width={size}
           height={size}
